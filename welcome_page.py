@@ -8,7 +8,7 @@ def welcome_page():
 
     # Get the absolute path to the background image
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    background_image = os.path.join(BASE_DIR, 'image_university')  # Adjusted path
+    background_image = os.path.join(BASE_DIR, 'image_university.jpg')  # Adjusted path
 
     # Read the image file and encode it to base64
     with open(image_university, 'rb') as f:
