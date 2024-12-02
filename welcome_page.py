@@ -3,7 +3,7 @@ import os
 import base64
 
 def welcome_page():
-    st.set_page_config(page_title="Claim Injury Type Prediction App", layout="wide")
+    
    # Define the image file name
     image_university = 'image_university.jpg'  # Ensure the correct file name and extension
     
