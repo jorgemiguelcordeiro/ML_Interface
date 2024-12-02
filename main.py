@@ -1,6 +1,6 @@
 
 import streamlit as st
-
+st.set_page_config(page_title="Claim Injury Type Prediction App", layout="wide")
 # Import page functions
 from welcome_page import welcome_page
 from input_page import input_page
