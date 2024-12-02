@@ -30,7 +30,7 @@ def welcome_page():
         page_bg_img = f'''
         <style>
         .stApp {{
-            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("data:image/jpeg;base64,{encoded_image}");
+            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url("data:image/jpeg;base64,{encoded_image}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
