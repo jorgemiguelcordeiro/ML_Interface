@@ -61,6 +61,12 @@ def welcome_page():
         - Fill out the form with accurate information.
         - Submit to receive a prediction of the injury type.
     """)
+    .stButton {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 10px;
+}
+
     if st.button("Proceed"):
         st.session_state.page = "input"
 
