@@ -2,15 +2,27 @@
 import streamlit as st
 import pandas as pd
 import pickle
+import os
 
 def output_page():
     st.title("Prediction Result")
 
-    # Load the model and scaler
-    with open('model.pkl', 'rb') as f:
-        model = pickle.load(f)
-    with open('scaler.pkl', 'rb') as f:
-        scaler = pickle.load(f)
+    # Get the absolute path to the directory containing this script
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    # Construct the full path to the model file
+    model_path = os.path.join(BASE_DIR, 'model.pkl')
+
+    # Load the model
+    try:
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
+    except FileNotFoundError:
+        st.error("Model file not found. Please ensure 'model.pkl' is in the correct directory.")
+        return
+    except Exception as e:
+        st.error(f"An error occurred while loading the model: {e}")
+        return
 
     # Prepare input data
     input_data = pd.DataFrame([st.session_state.inputs])
@@ -18,8 +30,13 @@ def output_page():
     # Preprocess input_data if necessary
     # For example, encoding categorical variables, scaling, etc.
 
-    # Make prediction
-    prediction = model.predict(input_data)[0]
+    # Handle exceptions during prediction
+    try:
+        # Make prediction
+        prediction = model.predict(input_data)[0]
+    except Exception as e:
+        st.error(f"An error occurred during prediction: {e}")
+        return
 
     st.subheader(f"The predicted Claim Injury Type is: **{prediction}**")
 
@@ -27,7 +44,7 @@ def output_page():
     if st.button("Save Result"):
         result_df = pd.DataFrame([{'Prediction': prediction, **st.session_state.inputs}])
         result_df.to_csv('prediction_result.csv', index=False)
-        st.success("Result saved as prediction_result.csv")
+        st.success("Result saved as 'prediction_result.csv'")
 
     # Return to Welcome Page
     if st.button("Return to Welcome Page"):
