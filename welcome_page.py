@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+import base64
 
 def welcome_page():
 
