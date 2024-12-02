@@ -3,9 +3,7 @@ import os
 import base64
 
 def welcome_page():
-    # Stream audio from a URL
-    audio_url = 'https://www.youtube.com/watch?v=sim825dUWuc'
-    st.video(audio_url)
+    
    # Define the image file name
     image_university = 'image_university.jpg'  # Ensure the correct file name and extension
     
