@@ -18,3 +18,5 @@ elif st.session_state.page == 'input':
 elif st.session_state.page == 'output':
     output_page()
 
+# Include theme toggle
+toggle_theme()
