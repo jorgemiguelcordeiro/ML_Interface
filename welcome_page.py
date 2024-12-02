@@ -39,6 +39,24 @@ def welcome_page():
         h1, h2, h3, h4, h5, h6, p, div, span {{
             color: white !important;
         }}
+        /* Style the 'Proceed' button container */
+        .stButton {{
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 10px;
+            width: 200px; /* Adjust as needed */
+            margin: 0 auto; /* Center the container */
+        }}
+
+        /* Style the 'Proceed' button */
+        .stButton>button {{
+            color: white !important;
+            background-color: #1E90FF !important;
+            border-radius: 10px;
+            width: 100%;
+            height: 50px;
+            font-size: 18px;
+        }}
         </style>
         '''
         st.markdown(page_bg_img, unsafe_allow_html=True)
@@ -61,11 +79,7 @@ def welcome_page():
         - Fill out the form with accurate information.
         - Submit to receive a prediction of the injury type.
     """)
-    .stButton {
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 5px;
-    border-radius: 10px;
-}
+    
 
     if st.button("Proceed"):
         st.session_state.page = "input"
