@@ -4,17 +4,22 @@ import base64
 
 def welcome_page():
 
-    st.set_page_config(page_title="Claim Injury Type Prediction App", layout="wide")
-
-    # Get the absolute path to the background image
+   st.set_page_config(page_title="Claim Injury Type Prediction App", layout="wide")
+    
+    # Define the image file name
+    image_university = 'image_university.jpg'  # Ensure this matches your actual file name and extension
+    
+    # Get the absolute path to the directory containing this script
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    background_image = os.path.join(BASE_DIR, 'image_university.jpg')  # Adjusted path
-
-    # Read the image file and encode it to base64
-    with open(image_university, 'rb') as f:
+    
+    # Construct the full path to the image file
+    image_path = os.path.join(BASE_DIR, image_university)
+    
+    # Read and encode the image
+    with open(image_path, 'rb') as f:
         data = f.read()
     encoded_image = base64.b64encode(data).decode()
-
+    
     # Inject CSS with the background image and overlay
     page_bg_img = f'''
     <style>
@@ -30,7 +35,7 @@ def welcome_page():
     }}
     </style>
     '''
-
+    
     st.markdown(page_bg_img, unsafe_allow_html=True)
     
     
