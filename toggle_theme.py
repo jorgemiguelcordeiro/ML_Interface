@@ -1,3 +1,4 @@
+import streamlit as st
 
 def toggle_theme():
     theme = st.radio("Select Theme:", ["Light", "Dark"])
