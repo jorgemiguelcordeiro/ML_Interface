@@ -5,6 +5,7 @@ import streamlit as st
 from welcome_page import welcome_page
 from input_page import input_page
 from output_page import output_page
+from toggle_theme import toggle_theme
 
 # Initialize session state
 if 'page' not in st.session_state:
