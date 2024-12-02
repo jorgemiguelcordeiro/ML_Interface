@@ -19,5 +19,15 @@ def welcome_page():
     if st.button("Proceed"):
         st.session_state.page = "input"
 
+    # Add a horizontal line to separate the content from the footer
+    st.markdown("""<hr style="height:2px;border:none;color:#333;background-color:#333;" /> """, unsafe_allow_html=True)
+
+    # Add the disclaimer at the bottom
+    st.markdown("""
+    <div style="text-align:center; font-size:12px; color:gray;">
+    This application was developed as part of a university project. All rights are reserved to the students involved in its creation. The data and results are intended for educational purposes only.
+    </div>
+    """, unsafe_allow_html=True)
+
 
 
