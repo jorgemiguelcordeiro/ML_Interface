@@ -4,10 +4,8 @@ import base64
 
 def welcome_page():
 
-   st.set_page_config(page_title="Claim Injury Type Prediction App", layout="wide")
-    
-    # Define the image file name
-    image_university = 'image_university.jpg'  # Ensure this matches your actual file name and extension
+   # Define the image file name
+    image_university = 'image_university.jpg'  # Ensure the correct file name and extension
     
     # Get the absolute path to the directory containing this script
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,27 +14,37 @@ def welcome_page():
     image_path = os.path.join(BASE_DIR, image_university)
     
     # Read and encode the image
-    with open(image_path, 'rb') as f:
-        data = f.read()
-    encoded_image = base64.b64encode(data).decode()
+    try:
+        with open(image_path, 'rb') as f:
+            data = f.read()
+        encoded_image = base64.b64encode(data).decode()
+    except FileNotFoundError:
+        st.error("Background image not found.")
+        encoded_image = None
+    except Exception as e:
+        st.error(f"An error occurred while loading the image: {e}")
+        encoded_image = None
     
-    # Inject CSS with the background image and overlay
-    page_bg_img = f'''
-    <style>
-    .stApp {{
-        background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("data:image/jpeg;base64,{encoded_image}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }}
-    h1, h2, h3, h4, h5, h6, p, div, span {{
-        color: white !important;
-    }}
-    </style>
-    '''
-    
-    st.markdown(page_bg_img, unsafe_allow_html=True)
+    # Inject CSS only if the image was loaded successfully
+    if encoded_image:
+        page_bg_img = f'''
+        <style>
+        .stApp {{
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url("data:image/jpeg;base64,{encoded_image}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }}
+        h1, h2, h3, h4, h5, h6, p, div, span {{
+            color: white !important;
+        }}
+        </style>
+        '''
+        st.markdown(page_bg_img, unsafe_allow_html=True)
+    else:
+        st.write("Using default background.")
+
     
     
     # Display the image
