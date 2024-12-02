@@ -6,6 +6,23 @@ def welcome_page():
     image_url = "https://media.licdn.com/dms/image/v2/D4D3DAQFGx0XnuUvugA/image-scale_191_1128/image-scale_191_1128/0/1662458005755/nova_ims_information_management_school_cover?e=2147483647&v=beta&t=J3Q4LlZi36_4UAFhj2019QdtfXLn0kQwaX25jgaBhOQ"
     st.image(image_url, use_column_width=True)
 
+    # CSS for animations
+    st.markdown("""
+    <style>
+    .fade-in-text {
+        animation: fadeIn 3s;
+    }
+
+    @keyframes fadeIn {
+        0% {opacity: 0;}
+        100% {opacity: 1;}
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Animated text
+    st.markdown('<div class="fade-in-text"><p>This application predicts the <strong>Claim Injury Type</strong> for claims processed by the New York Workers\' Compensation Board (WCB).</p></div>', unsafe_allow_html=True)
+
     st.title("Welcome to the Claim Injury Type Prediction App")
     
     st.write("""
