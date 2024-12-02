@@ -8,7 +8,7 @@ from output_page import output_page
 from toggle_theme import toggle_theme
     
 # Include theme toggle
-toggle_theme()
+#toggle_theme()
 
 
 # Initialize session state
