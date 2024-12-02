@@ -10,6 +10,9 @@ from toggle_theme import toggle_theme
 # Initialize session state
 if 'page' not in st.session_state:
     st.session_state.page = 'welcome'
+    
+# Include theme toggle
+toggle_theme()
 
 # Page Navigation
 if st.session_state.page == 'welcome':
@@ -19,5 +22,3 @@ elif st.session_state.page == 'input':
 elif st.session_state.page == 'output':
     output_page()
 
-# Include theme toggle
-toggle_theme()
