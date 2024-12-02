@@ -1,3 +1,4 @@
+
 import streamlit as st
 
 def toggle_theme():
@@ -6,11 +7,8 @@ def toggle_theme():
         st.markdown(
             """
             <style>
-            .css-18e3th9 {
+            html, body, [class*="css"]  {
                 background-color: #0E1117 !important;
-                color: #FFFFFF !important;
-            }
-            .css-1d391kg {
                 color: #FFFFFF !important;
             }
             </style>
@@ -21,16 +19,11 @@ def toggle_theme():
         st.markdown(
             """
             <style>
-            .css-18e3th9 {
+            html, body, [class*="css"]  {
                 background-color: #FFFFFF !important;
-                color: #000000 !important;
-            }
-            .css-1d391kg {
                 color: #000000 !important;
             }
             </style>
             """,
             unsafe_allow_html=True
         )
-
-
