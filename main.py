@@ -6,13 +6,14 @@ from welcome_page import welcome_page
 from input_page import input_page
 from output_page import output_page
 from toggle_theme import toggle_theme
+    
+# Include theme toggle
+toggle_theme()
+
 
 # Initialize session state
 if 'page' not in st.session_state:
     st.session_state.page = 'welcome'
-    
-# Include theme toggle
-toggle_theme()
 
 # Page Navigation
 if st.session_state.page == 'welcome':
