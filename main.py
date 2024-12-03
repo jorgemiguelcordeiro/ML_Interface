@@ -23,5 +23,5 @@ if st.session_state.page == 'welcome':
 elif st.session_state.page == 'input':
     input_page()
 elif st.session_state.page == 'output':
-    output_page()'''
+    output_page()
 
