@@ -70,16 +70,19 @@ def welcome_page():
     #st.image(image_url, use_column_width=True)
 
     st.title("Welcome to the Claim Injury Type Prediction App")
-    
-    st.write("""
-        This application predicts the **Claim Injury Type** for claims processed by the New York Workers' Compensation Board (WCB).
-        
-        **Instructions:**
-        - Click the **Proceed** button **two times** to input claim-related data.
-        - Fill out the form with accurate information.
-        - Submit to receive a prediction of the injury type.
-    """)
-    
+
+  
+    st.markdown('''
+<div style="background-color:rgba(0,0,0,0.6); padding:20px; border-radius:10px;">
+<h2 style="color:white;">Instructions</h2>
+<ul style="color:white;font-size:16px;">
+  <li>Click the <strong>Proceed</strong> button to start entering claim-related data.</li>
+  <li>Fill out all fields accurately.</li>
+  <li>Submit the form to receive the predicted injury type.</li>
+</ul>
+</div>
+''', unsafe_allow_html=True)
+
 
     if st.button("Proceed"):
         st.session_state.page = "input"
