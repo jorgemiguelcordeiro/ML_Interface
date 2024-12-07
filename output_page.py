@@ -1,4 +1,5 @@
 
+pip install dice-ml
 
 import streamlit as st
 import pandas as pd
