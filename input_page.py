@@ -133,9 +133,7 @@ def input_page():
         st.session_state.page = "output"
         st.success("Your data has been submitted! You will be redirected to the output page.")
 
-    # Optional: Add a reset button if desired
-    if st.button("Reset"):
-        st.experimental_rerun()
+
 
 
 
