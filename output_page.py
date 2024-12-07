@@ -1,5 +1,10 @@
 
+pip install streamlit
+pip install pandas
+pip install shap
+pip install joblib
 pip install dice-ml
+
 
 import streamlit as st
 import pandas as pd
