@@ -1,5 +1,7 @@
 import streamlit as st
 import datetime
+pip install dice-ml
+
 
 def input_page():
     # Sidebar branding/instructions
