@@ -1,14 +1,15 @@
 
-# Import page functions
-from welcome_page import welcome_page
-from input_page import input_page
-from output_page import output_page
-from toggle_theme import toggle_theme
+
 import streamlit as st
 #import streamlit_authenticator as stauth
 
 st.set_page_config(page_title="Claim Injury Type Prediction App", layout="wide")
 
+# Import page functions
+from welcome_page import welcome_page
+from input_page import input_page
+from output_page import output_page
+from toggle_theme import toggle_theme
     
 # Include theme toggle
 #toggle_theme()
