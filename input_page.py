@@ -3,7 +3,7 @@ import datetime
 
 def input_page():
     # Sidebar branding/instructions
-    st.sidebar.image("path_to_logo.png", use_column_width=True)  # Replace with your logo
+    st.sidebar.image("New York Workers' Compensation Board (WCB).png", use_column_width=True)  # Replace with your logo
     st.sidebar.write("**Instructions:**")
     st.sidebar.write("1. Fill out all the necessary claim-related information.")
     st.sidebar.write("2. Use the hints next to each field for clarification.")
