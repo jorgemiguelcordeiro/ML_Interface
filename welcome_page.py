@@ -72,16 +72,23 @@ def welcome_page():
     st.title("Welcome to the Claim Injury Type Prediction App")
 
   
-    st.markdown('''
+   st.markdown('''
 <div style="background-color:rgba(0,0,0,0.6); padding:20px; border-radius:10px;">
 <h2 style="color:white;">Instructions</h2>
 <ul style="color:white;font-size:16px;">
-  <li>Click the <strong>Proceed</strong> button to start entering claim-related data.</li>
-  <li>Fill out all fields accurately.</li>
-  <li>Submit the form to receive the predicted injury type.</li>
+  <li>Use the sidebar to navigate between pages: 
+    <ul>
+      <li><strong>EDA</strong>: Explore and understand the dataset before predicting.</li>
+      <li><strong>Prediction</strong>: Input your claim-related data and receive a prediction.</li>
+    </ul>
+  </li>
+  <li>If you prefer to go directly to input data, click the <strong>Proceed</strong> button below.</li>
+  <li>Fill out all fields accurately and submit the form to receive the predicted injury type.</li>
 </ul>
 </div>
 ''', unsafe_allow_html=True)
+
+
 
 
     if st.button("Proceed"):
