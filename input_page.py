@@ -12,6 +12,10 @@ def input_page():
     st.sidebar.write("For support, contact: support@company.com")
 
     # Page title and instructions at the top
+    st.markdown(
+        "<p style='color:red; font-weight:bold; font-size:16px;'>THIS FORM MAY ONLY BE SUBMITTED ELECTRONICALLY. DO NOT MAIL.</p>",
+        unsafe_allow_html=True
+    )
     st.title("Input Claim Data")
     st.write("Please provide the following information for the claim. Fields are organized for clarity. Hover over the info icons for additional details.")
 
