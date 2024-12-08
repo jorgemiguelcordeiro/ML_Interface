@@ -1,46 +1,50 @@
-
-
 import streamlit as st
-import numpy as np
-import pickle
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# Load the saved model and scaler
-with open('model.pkl', 'rb') as f:
-    model = pickle.load(f)
-with open('scaler.pkl', 'rb') as f:
-    scaler = pickle.load(f)
+def eda_page():
+    st.title("Dataset Overview")
 
-# Feature names in the correct order
-feature_names = ['BMI', 'Age', 'HighBP', 'HighChol', 'GenHlth', 'PhysHlth', 'MentHlth', 'Smoker', 'PhysActivity', 'Sex']
+    # Load your data
+    # Adjust the path as needed
+    data_path = "train_data.zip/train_data"
+    df = pd.read_csv(data_path)
 
-# Form to collect data
-st.title("Diabetes Prediction")
-data = []
-for feature in feature_names:
-    # Use an appropriate input widget based on data type
-    data.append(st.number_input(f'Enter {feature}', format="%.2f"))
+    st.write("Below is a sample of the dataset:")
+    st.dataframe(df.head(10))  # Show first 10 rows
 
-# Button to make prediction
-if st.button('Predict'):
-    try:
-        input_data = np.array([data])
-        input_data_scaled = scaler.transform(input_data)
-        y_pred_prob = model.predict_proba(input_data_scaled)[:, 1]
-        probability = y_pred_prob[0] * 100  # Convert to percentage
+    # Add filters: for example, filter by date range if 'accident_date' column exists
+    if 'accident_date' in df.columns:
+        st.sidebar.markdown("### Filter by Date Range")
+        start_date = st.sidebar.date_input("Start Date", value=df['accident_date'].min())
+        end_date = st.sidebar.date_input("End Date", value=df['accident_date'].max())
+
+        # Ensure the date columns are in datetime format
+        if df['accident_date'].dtype == 'object':
+            df['accident_date'] = pd.to_datetime(df['accident_date'], errors='coerce')
+
+        filtered_df = df[(df['accident_date'] >= pd.to_datetime(start_date)) &
+                         (df['accident_date'] <= pd.to_datetime(end_date))]
+    else:
+        filtered_df = df
+
+    st.write(f"**Number of records after filtering**: {len(filtered_df)}")
+
+    # Add a simple plot: e.g., distribution of a numeric column 'age_at_injury'
+    if 'age_at_injury' in filtered_df.columns:
+        st.write("### Graphs and Visualizations")
+        st.write("Distribution of Age at Injury")
         
-        # Multi-level threshold evaluation
-        if probability >= 75:
-            result = "The patient has a high likelihood of having diabetes."
-        elif 50 <= probability < 75:
-            result = "The patient has a moderate likelihood of having diabetes."
-        elif 30 <= probability < 50:
-            result = "The patient has a low likelihood of having diabetes."
-        else:
-            result = "The patient is unlikely to have diabetes."
-        
-        st.write(f'Result: {result}')
-        st.write(f'Probability of Diabetes: {probability:.2f}%')
-    except Exception as e:
-        st.error(f"Error: {str(e)}")
+        fig, ax = plt.subplots()
+        filtered_df['age_at_injury'].hist(ax=ax, bins=20)
+        ax.set_xlabel("Age at Injury")
+        ax.set_ylabel("Count")
+        ax.set_title("Distribution of Age at Injury")
+        st.pyplot(fig)
+    else:
+        st.write("No 'age_at_injury' column found for plotting.")
 
+    # Add a button to proceed to input page
+    if st.button("Proceed to Prediction"):
+        st.session_state.page = "input"
 
