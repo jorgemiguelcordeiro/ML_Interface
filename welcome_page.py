@@ -71,7 +71,7 @@ def welcome_page():
 
     st.title("Welcome to the Claim Injury Type Prediction App")
 
-  
+  '''
    st.markdown('''
 <div style="background-color:rgba(0,0,0,0.6); padding:20px; border-radius:10px;">
 <h2 style="color:white;">Instructions</h2>
@@ -87,7 +87,7 @@ def welcome_page():
 </ul>
 </div>
 ''', unsafe_allow_html=True)
-
+'''
 
 
 
