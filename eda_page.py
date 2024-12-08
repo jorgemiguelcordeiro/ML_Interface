@@ -10,7 +10,7 @@ def eda_page():
 
     # Load your data
     # Adjust the path as needed
-    data_path = "train_data/train_data"
+    data_path = "train_data.zip/train_data"
     df = pd.read_csv(data_path)
 
     st.write("Below is a sample of the dataset:")
