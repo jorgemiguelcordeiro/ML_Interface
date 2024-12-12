@@ -108,7 +108,7 @@ def input_page():
         'c3_date': c3_date,
         'carrier_name': carrier_name,
         'carrier_type': carrier_type,
-        'claim_identifier': claim_identifier,
+        #'claim_identifier': claim_identifier,
         'county_of_injury': county_of_injury,
         'covid_19_indicator': covid_19_indicator,
         'district_name': district_name,
