@@ -28,10 +28,28 @@ def output_page():
     unused_columns = ['OIICS Nature of Injury Description']
     input_data = input_data.drop(columns=unused_columns, errors='ignore')
 
-    # Apply the mappings to the inputs
-    input_data['Alternative Dispute Resolution'] = input_data['Alternative Dispute Resolution'].map({'Yes': 1, 'No': 0})
-    input_data['Gender'] = input_data['Gender'].map({'F': 0, 'M': 1})
-    input_data['Attorney/Representative'] = input_data['Attorney/Representative'].map({'No': 0, 'Yes': 1})
+    # Check for available columns
+    st.write("Input Data Columns:", input_data.columns)
+
+    # Apply mapping for 'Alternative Dispute Resolution' if it exists
+    if 'Alternative Dispute Resolution' in input_data.columns:
+        input_data['Alternative Dispute Resolution'] = input_data['Alternative Dispute Resolution'].map({'Yes': 1, 'No': 0}).fillna(0)
+    else:
+        st.warning("'Alternative Dispute Resolution' column is missing in the input data.")
+
+    # Apply mapping for 'Gender' if it exists
+    if 'Gender' in input_data.columns:
+        input_data['Gender'] = input_data['Gender'].map({'F': 0, 'M': 1}).fillna(0)
+    else:
+        st.warning("'Gender' column is missing in the input data.")
+
+    # Apply mapping for 'Attorney/Representative' if it exists
+    if 'Attorney/Representative' in input_data.columns:
+        input_data['Attorney/Representative'] = input_data['Attorney/Representative'].map({'No': 0, 'Yes': 1}).fillna(0)
+    else:
+        st.warning("'Attorney/Representative' column is missing in the input data.")
+
+    st.write("Processed Input Data:", input_data)
 
     # Preprocess input_data if necessary
     # For example, encoding categorical variables, scaling, etc.
