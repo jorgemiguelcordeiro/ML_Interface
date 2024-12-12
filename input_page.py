@@ -42,7 +42,7 @@ def input_page():
         with col3:
             age_at_injury = st.number_input("Age at Injury", min_value=0, max_value=100, value=30, help="Age of the injured worker at the time of injury.")
             birth_year = st.number_input("Birth Year", min_value=1900, max_value=datetime.date.today().year, value=1990, help="Year of birth of the injured worker.")
-            gender = st.selectbox("Gender", ["Male", "Female", "Other", "Prefer not to say"], help="Gender of the injured worker.")
+            gender = st.selectbox("Gender", ["Male", "Female"], help="Gender of the injured worker.")
             average_weekly_wage = st.number_input("Average Weekly Wage ($)", min_value=0.0, value=1000.0, help="Wage used to calculate benefits.")
 
         with col4:
