@@ -6,7 +6,6 @@ import os
 def output_page():
     st.title("Prediction Result")
 
-    
     # Construct the full path to the model file
     model_path = 'logistic_model.pkl'
 
@@ -14,13 +13,14 @@ def output_page():
     try:
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
+            st.write("Model loaded successfully. Model type:", type(model))
     except FileNotFoundError:
         st.error("Model file not found. Please ensure 'model.pkl' is in the correct directory.")
         return
     except Exception as e:
         st.error(f"An error occurred while loading the model: {e}")
         return
-    st.write("Model loaded successfully. Model type:", type(model))
+    
 
 
     # Prepare input data
