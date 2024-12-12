@@ -28,7 +28,7 @@ def input_page():
             accident_date = st.date_input("Accident Date", value=datetime.date.today(), help="Date when the accident occurred.")
             injury_date = st.date_input("Injury Date", value=datetime.date.today(), help="Date of the reported injury. Often same as Accident Date.")
             assembly_date = st.date_input("Assembly Date", value=datetime.date.today(), help="Date the claim was first assembled by the board.")
-            claim_identifier = st.text_input("Claim Identifier", placeholder="e.g., CLM-12345", help="Unique ID assigned by WCB.")
+            #claim_identifier = st.text_input("Claim Identifier", placeholder="e.g., CLM-12345", help="Unique ID assigned by WCB.")
 
         with col2:
             c2_date = st.date_input("C-2 Date", value=datetime.date.today(), help="Date the Employer's Report of Work-Related Injury/Illness (C-2) was received.")
