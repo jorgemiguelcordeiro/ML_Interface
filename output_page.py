@@ -20,7 +20,7 @@ def output_page():
     except Exception as e:
         st.error(f"An error occurred while loading the model: {e}")
         return
-    print(type(model))
+    print(type(model_path))
 
 
     # Prepare input data
