@@ -28,9 +28,9 @@ def output_page():
     unused_columns = ['OIICS Nature of Injury Description']
     input_data = input_data.drop(columns=unused_columns, errors='ignore')
     # Apply the mappings to the inputs
-    inputs['Alternative Dispute Resolution'] = 0 if inputs['Alternative Dispute Resolution'] == 'Yes' else 1
-    inputs['Gender'] = 0 if inputs['Gender'] == 'F' else 1
-    inputs['Attorney/Representative'] = 0 if inputs['Attorney/Representative'] == 'No' else 1
+    input_data['Alternative Dispute Resolution'] = 0 if input_data['Alternative Dispute Resolution'] == 'Yes' else 1
+    input_data['Gender'] = 0 if input_data['Gender'] == 'F' else 1
+    input_data['Attorney/Representative'] = 0 if input_data['Attorney/Representative'] == 'No' else 1
 
     # Preprocess input_data if necessary
     # For example, encoding categorical variables, scaling, etc.
