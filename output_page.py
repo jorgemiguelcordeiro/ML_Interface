@@ -20,6 +20,8 @@ def output_page():
     except Exception as e:
         st.error(f"An error occurred while loading the model: {e}")
         return
+    print(type(model))
+
 
     # Prepare input data
     input_data = pd.DataFrame([st.session_state.inputs])
