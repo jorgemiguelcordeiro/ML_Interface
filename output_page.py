@@ -8,7 +8,7 @@ def output_page():
 
     
     # Construct the full path to the model file
-    model_path = 'logistic.pkl'
+    model_path = 'logistic_model.pkl'
 
     # Load the model
     try:
