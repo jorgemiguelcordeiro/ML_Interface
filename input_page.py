@@ -48,8 +48,8 @@ def input_page():
         with col4:
             attorney_representative = st.selectbox("Attorney/Representative", ["Yes", "No"], help="Whether the claim has an attorney or representative.")
             alternative_dispute_resolution = st.selectbox("Alternative Dispute Resolution", ["Yes", "No"], help="Whether external adjudication processes are used.")
-            agreement_reached = st.selectbox("Agreement Reached", ["Yes", "No"], help="Indicates if an agreement was reached without WCB involvement.")
-            wcb_decision = st.selectbox("WCB Decision", ["Accident", "Occupational Disease", "Pending"], help="Decision category relative to the claim by WCB.")
+            #agreement_reached = st.selectbox("Agreement Reached", ["Yes", "No"], help="Indicates if an agreement was reached without WCB involvement.")
+            #wcb_decision = st.selectbox("WCB Decision", ["Accident", "Occupational Disease", "Pending"], help="Decision category relative to the claim by WCB.")
 
     # Group 3: Location & Industry Details
     with st.expander("Location & Industry"):
@@ -126,8 +126,8 @@ def input_page():
         'wcio_part_of_body_code': wcio_part_of_body_code,
         'wcio_part_of_body_description': wcio_part_of_body_description,
         'zip_code': zip_code,
-        'agreement_reached': agreement_reached,
-        'wcb_decision': wcb_decision
+        #'agreement_reached': agreement_reached,
+        #'wcb_decision': wcb_decision
     }
 
     # A final call to action at the bottom
