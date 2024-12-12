@@ -26,7 +26,6 @@ def input_page():
 
         with col1:
             accident_date = st.date_input("Accident Date", value=datetime.date.today(), help="Date when the accident occurred.")
-            injury_date = st.date_input("Injury Date", value=datetime.date.today(), help="Date of the reported injury. Often same as Accident Date.")
             assembly_date = st.date_input("Assembly Date", value=datetime.date.today(), help="Date the claim was first assembled by the board.")
             #claim_identifier = st.text_input("Claim Identifier", placeholder="e.g., CLM-12345", help="Unique ID assigned by WCB.")
 
@@ -97,7 +96,6 @@ def input_page():
     # Collect all inputs into a dictionary
     inputs = {
         'accident_date': accident_date,
-        'injury_date': injury_date,
         'age_at_injury': age_at_injury,
         'alternative_dispute_resolution': alternative_dispute_resolution,
         'assembly_date': assembly_date,
