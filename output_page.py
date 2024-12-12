@@ -6,11 +6,9 @@ import os
 def output_page():
     st.title("Prediction Result")
 
-    # Get the absolute path to the directory containing this script
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
+    
     # Construct the full path to the model file
-    model_path = os.path.join(BASE_DIR, 'logistic.pkl')
+    model_path = 'logistic.pkl'
 
     # Load the model
     try:
