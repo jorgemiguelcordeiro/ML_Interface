@@ -10,7 +10,7 @@ def output_page():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
     # Construct the full path to the model file
-    model_path = os.path.join(BASE_DIR, 'model.pkl')
+    model_path = os.path.join(BASE_DIR, 'logistic.pkl')
 
     # Load the model
     try:
