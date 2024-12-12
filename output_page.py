@@ -26,6 +26,10 @@ def output_page():
     # Prepare input data
     input_data = pd.DataFrame([st.session_state.inputs])
 
+    # Drop columns that are not used in the model
+    unused_columns = ['OIICS Nature of Injury Description']
+    input_data = input_data.drop(columns=unused_columns, errors='ignore')
+
     # Preprocess input_data if necessary
     # For example, encoding categorical variables, scaling, etc.
 
