@@ -27,10 +27,11 @@ def output_page():
     # Drop columns that are not used in the model
     unused_columns = ['OIICS Nature of Injury Description']
     input_data = input_data.drop(columns=unused_columns, errors='ignore')
+
     # Apply the mappings to the inputs
-    input_data['Alternative Dispute Resolution'] = 0 if input_data['Alternative Dispute Resolution'] == 'Yes' else 1
-    input_data['Gender'] = 0 if input_data['Gender'] == 'F' else 1
-    input_data['Attorney/Representative'] = 0 if input_data['Attorney/Representative'] == 'No' else 1
+    input_data['Alternative Dispute Resolution'] = input_data['Alternative Dispute Resolution'].map({'Yes': 1, 'No': 0})
+    input_data['Gender'] = input_data['Gender'].map({'F': 0, 'M': 1})
+    input_data['Attorney/Representative'] = input_data['Attorney/Representative'].map({'No': 0, 'Yes': 1})
 
     # Preprocess input_data if necessary
     # For example, encoding categorical variables, scaling, etc.
