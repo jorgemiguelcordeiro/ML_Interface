@@ -13,7 +13,7 @@ def output_page():
     try:
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
-            st.write("Model loaded successfully. Model type:", type(model))
+       
     except FileNotFoundError:
         st.error("Model file not found. Please ensure 'model.pkl' is in the correct directory.")
         return
