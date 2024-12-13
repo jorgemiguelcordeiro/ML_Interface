@@ -24,8 +24,6 @@ def output_page():
         st.error("No input data found in session state. Please return to the input page.")
         return
 
-    # Debug: Inspect session state
-    st.write("Session State at Output Page:", st.session_state.inputs)
 
     # Prepare input data
     inputs = pd.DataFrame([st.session_state.inputs])  # Convert session state inputs to a DataFrame
