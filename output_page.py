@@ -23,75 +23,61 @@ def output_page():
         st.error("No input data found in session state. Please return to the input page.")
         return
 
-    # Prepare input data
-    inputs = pd.DataFrame([st.session_state.inputs])  # Convert session state inputs to a DataFrame
-
-    # Debug: Inspect raw input data
-    st.write("Raw Input Data Before Processing:", inputs)
+    # Convert session state inputs to DataFrame
+    inputs = pd.DataFrame([st.session_state.inputs])  
     
-   # Debug: Check why required columns might be missing
-    required_columns = ['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']
-    for col in required_columns:
-        if col not in inputs.columns:
-            st.warning(f"'{col}' column is missing from the inputs. Adding it with default value 0.")
-        # Debugging missing column
-            if col not in st.session_state.inputs:
-                st.error(f"'{col}' is not present in st.session_state.inputs. Check the input page to ensure this field is captured correctly.")
-            else:
-                st.error(f"'{col}' exists in st.session_state.inputs but is not included in the DataFrame. Possible data conversion issue.")
-        
+    # Debug: Show raw input data
+    st.write("**Raw Input Data Before Processing:**", inputs)
 
-    # Drop unused columns
+    # Check required columns
+    required_columns = ['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']
+    missing_required_cols = [col for col in required_columns if col not in inputs.columns]
+
+    if missing_required_cols:
+        for col in missing_required_cols:
+            st.warning(f"'{col}' column is missing from the inputs. Please ensure it is captured in the input page.")
+        # We do not return here; let's continue so we can inspect what's present
+
+    # Debug: Show columns before dropping unused columns
+    st.write("**Columns before dropping unused columns:**", inputs.columns.tolist())
+
+    # Drop unused columns if present
     unused_columns = ['OIICS Nature of Injury Description']
     inputs = inputs.drop(columns=unused_columns, errors='ignore')
 
-    # Apply mappings to convert categorical variables into numerical representations
-    mapping_errors = {}
-    try:
-        if 'Gender' in inputs.columns:
-            inputs['Gender'] = inputs['Gender'].map({'Female': 0, 'Male': 1})
-            unmapped_gender = inputs['Gender'].isnull().sum()
-            if unmapped_gender > 0:
-                mapping_errors['Gender'] = unmapped_gender
+    # Debug: Show columns after dropping unused columns
+    st.write("**Columns after dropping unused columns:**", inputs.columns.tolist())
 
-        if 'Alternative Dispute Resolution' in inputs.columns:
-            inputs['Alternative Dispute Resolution'] = inputs['Alternative Dispute Resolution'].map({'Yes': 1, 'No': 0})
-            unmapped_adr = inputs['Alternative Dispute Resolution'].isnull().sum()
-            if unmapped_adr > 0:
-                mapping_errors['Alternative Dispute Resolution'] = unmapped_adr
+    # Apply mappings if columns exist
+    # Print unique values before mapping for debugging
+    categorical_mappings = {
+        'Gender': {'Female': 0, 'Male': 1},
+        'Alternative Dispute Resolution': {'Yes': 1, 'No': 0},
+        'Attorney/Representative': {'No': 0, 'Yes': 1},
+        'COVID-19 Indicator': {'No': 0, 'Yes': 1}
+    }
 
-        if 'Attorney/Representative' in inputs.columns:
-            inputs['Attorney/Representative'] = inputs['Attorney/Representative'].map({'No': 0, 'Yes': 1})
-            unmapped_attorney = inputs['Attorney/Representative'].isnull().sum()
-            if unmapped_attorney > 0:
-                mapping_errors['Attorney/Representative'] = unmapped_attorney
-
-        if 'COVID-19 Indicator' in inputs.columns:
-            inputs['COVID-19 Indicator'] = inputs['COVID-19 Indicator'].map({'No': 0, 'Yes': 1})
-            unmapped_covid = inputs['COVID-19 Indicator'].isnull().sum()
-            if unmapped_covid > 0:
-                mapping_errors['COVID-19 Indicator'] = unmapped_covid
-    except Exception as e:
-        st.error(f"An error occurred during mapping: {e}")
-        return
-
-    # Check for mapping errors
-    if mapping_errors:
-        for col, count in mapping_errors.items():
-            st.warning(f"{count} value(s) in the column '{col}' could not be mapped. Please check input data.")
-        return
+    for col, mapping in categorical_mappings.items():
+        if col in inputs.columns:
+            st.write(f"**Unique values in '{col}' before mapping:**", inputs[col].unique().tolist())
+            inputs[col] = inputs[col].map(mapping)
+            st.write(f"**Unique values in '{col}' after mapping:**", inputs[col].unique().tolist())
+        else:
+            st.warning(f"Skipping mapping for '{col}' because it does not exist in the DataFrame.")
 
     # Debug: Inspect processed input data
-    st.write("Processed Input Data:", inputs)
- 
+    st.write("**Processed Input Data:**", inputs)
 
-    # Perform prediction
+    # Perform prediction if all needed columns are present
     try:
+        # Attempt to predict only if we have the columns needed by the model
+        # The model might require a certain set of columns. Ensure you know them.
+        # Assuming the model requires the columns currently in 'inputs'
         prediction = model.predict(inputs)[0]
         st.subheader(f"The predicted Claim Injury Type is: **{prediction}**")
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
-        return
+        # Don't return here, so we can still potentially save or debug further
 
     # Save Results
     if st.button("Save Result"):
@@ -102,3 +88,4 @@ def output_page():
     # Navigation
     if st.button("Return to Welcome Page"):
         st.session_state.page = 'welcome'
+
