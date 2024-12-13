@@ -73,7 +73,7 @@ def output_page():
 
     # Debug: Inspect processed input data
     st.write("Processed Input Data:", inputs)
-    st.write("Processed Data After Mapping:", inputs[required_columns])
+ 
 
     # Perform prediction
     try:
