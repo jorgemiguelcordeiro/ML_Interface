@@ -267,7 +267,7 @@ def output_page():
             lambda x: map_value_to_category(x, carrier_type_mapping)
         )
 
-    st.write("**Processed Input Data Before Categorization:**", inputs)
+    #st.write("**Processed Input Data Before Categorization:**", inputs)
 
     # Apply wage and IME-4 count categories if columns exist
     if 'average_weekly_wage' in inputs.columns:
