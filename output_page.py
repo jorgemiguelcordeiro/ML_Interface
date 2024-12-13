@@ -30,7 +30,7 @@ def output_page():
     st.write("**Raw Input Data Before Processing:**", inputs)
 
     # Check required columns
-    required_columns = ['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']
+    required_columns = ['gender', 'alternative_dispute_resolution', 'attorney_representative', 'covid_19_indicator']
     missing_required_cols = [col for col in required_columns if col not in inputs.columns]
 
     if missing_required_cols:
@@ -51,10 +51,10 @@ def output_page():
     # Apply mappings if columns exist
     # Print unique values before mapping for debugging
     categorical_mappings = {
-        'Gender': {'Female': 0, 'Male': 1},
-        'Alternative Dispute Resolution': {'Yes': 1, 'No': 0},
-        'Attorney/Representative': {'No': 0, 'Yes': 1},
-        'COVID-19 Indicator': {'No': 0, 'Yes': 1}
+        'gender': {'Female': 0, 'Male': 1},
+        'alternative_dispute_resolution': {'Yes': 1, 'No': 0},
+        'attorney_representative': {'No': 0, 'Yes': 1},
+        'covid_19_indicator': {'No': 0, 'Yes': 1}
     }
 
     for col, mapping in categorical_mappings.items():
