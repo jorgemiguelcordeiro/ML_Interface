@@ -1,8 +1,39 @@
 import streamlit as st
 import pandas as pd
 import pickle
+import numpy as np
 
-# Define your mapping dictionaries outside the function
+# Categorization functions
+def categorize_wage(x):
+    if pd.isna(x) or x <= 0:
+        return 'Invalid'
+    elif x <= 702:
+        return 'Very Low Income'
+    elif x <= 1100:
+        return 'Low Income'
+    elif x <= 1600:
+        return 'Middle Income'
+    elif x <= 3000:
+        return 'Upper Middle Income (Q3 to Upper Fence)'
+    else:
+        return 'High Income (> Upper Fence)'
+
+def categorize_ime4_count(count):
+    if pd.isna(count) or count < 0:
+        return 'Invalid'
+    elif count < 1:
+        return "Low IME-4 Count"
+    elif 1 <= count <= 2:
+        return "Low IME-4 Count"
+    elif 2 < count <= 4:
+        return "Medium IME-4 Count"
+    elif 4 < count <= 8.5:
+        return "High IME-4 Count"
+    else:
+        return "Very High IME-4 Count"
+
+
+# Mapping dictionaries (unchanged)
 industry_code_description_mapping = {
     "Service-Providing Industries": [
         'ARTS, ENTERTAINMENT, AND RECREATION', 'ACCOMMODATION AND FOOD SERVICES', 'INFORMATION', 
@@ -176,7 +207,6 @@ def output_page():
     st.write("**Raw Input Data Before Processing:**", inputs)
 
     # Example of required columns
-    # Adjust these if you changed column names
     required_columns = [
         'gender', 'alternative_dispute_resolution', 
         'attorney_representative', 'covid_19_indicator', 
@@ -194,7 +224,7 @@ def output_page():
     unused_columns = ['OIICS Nature of Injury Description']  # adjust or remove if needed
     inputs = inputs.drop(columns=unused_columns, errors='ignore')
 
-    # Map categorical values (gender, etc.) - adjust keys/values to match your data
+    # Map categorical values (gender, etc.)
     gender_map = {'Female': 0, 'Male': 1}
     if 'gender' in inputs.columns:
         inputs['gender'] = inputs['gender'].map(gender_map)
@@ -211,7 +241,7 @@ def output_page():
     if 'attorney_representative' in inputs.columns:
         inputs['attorney_representative'] = inputs['attorney_representative'].map(attorney_map)
 
-    # Now apply the dictionary-based category mappings
+    # Apply dictionary-based category mappings
     if 'industry_code_description' in inputs.columns:
         inputs['industry_code_description'] = inputs['industry_code_description'].apply(
             lambda x: map_value_to_category(x, industry_code_description_mapping)
@@ -237,7 +267,20 @@ def output_page():
             lambda x: map_value_to_category(x, carrier_type_mapping)
         )
 
-    st.write("**Processed Input Data:**", inputs)
+    st.write("**Processed Input Data Before Categorization:**", inputs)
+
+    # Apply wage and IME-4 count categories if columns exist
+    if 'average_weekly_wage' in inputs.columns:
+        inputs['Wage Category'] = inputs['average_weekly_wage'].apply(categorize_wage)
+    else:
+        st.warning("'average_weekly_wage' column not found. Unable to categorize wage.")
+
+    if 'ime4_count' in inputs.columns:
+        inputs['IME-4 Count Category'] = inputs['ime4_count'].apply(categorize_ime4_count)
+    else:
+        st.warning("'ime4_count' column not found. Unable to categorize IME-4 count.")
+
+    st.write("**Processed Input Data After Categorization:**", inputs)
 
     # Perform prediction
     try:
@@ -255,5 +298,6 @@ def output_page():
     # Navigation
     if st.button("Return to Welcome Page"):
         st.session_state.page = 'welcome'
+
 
 
