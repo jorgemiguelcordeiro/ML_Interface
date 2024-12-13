@@ -29,7 +29,7 @@ def output_page():
     # Debug: Inspect raw input data
     st.write("Raw Input Data Before Processing:", inputs)
     
-    st.write("Raw Input Data Before Mapping:", inputs[required_columns])
+
 
     # Drop unused columns
     unused_columns = ['OIICS Nature of Injury Description']
