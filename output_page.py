@@ -29,12 +29,6 @@ def output_page():
     # Debug: Inspect raw input data
     st.write("Raw Input Data Before Processing:", inputs)
     
-    required_columns = ['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']
-    for col in required_columns:
-        if col not in inputs.columns:
-            st.warning(f"'{col}' column is missing from the inputs. Adding it with default value 0.")
-            inputs[col] = 0  # Default value for missing columns
-
     st.write("Raw Input Data Before Mapping:", inputs[required_columns])
 
     # Drop unused columns
