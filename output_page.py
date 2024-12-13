@@ -44,13 +44,13 @@ def output_page():
     # Apply mappings to convert categorical variables into numerical representations
     try:
         if 'Gender' in inputs.columns:
-            inputs['Gender'] = inputs['Gender'].map({'Female': 0, 'Male': 1}).fillna(0)
+            inputs['Gender'] = inputs['Gender'].map({'Female': 0, 'Male': 1})
         if 'Alternative Dispute Resolution' in inputs.columns:
-            inputs['Alternative Dispute Resolution'] = inputs['Alternative Dispute Resolution'].map({'Yes': 1, 'No': 0}).fillna(0)
+            inputs['Alternative Dispute Resolution'] = inputs['Alternative Dispute Resolution'].map({'Yes': 1, 'No': 0})
         if 'Attorney/Representative' in inputs.columns:
-            inputs['Attorney/Representative'] = inputs['Attorney/Representative'].map({'No': 0, 'Yes': 1}).fillna(0)
+            inputs['Attorney/Representative'] = inputs['Attorney/Representative'].map({'No': 0, 'Yes': 1})
         if 'COVID-19 Indicator' in inputs.columns:
-            inputs['COVID-19 Indicator'] = inputs['COVID-19 Indicator'].map({'No': 0, 'Yes': 1}).fillna(0)
+            inputs['COVID-19 Indicator'] = inputs['COVID-19 Indicator'].map({'No': 0, 'Yes': 1})
     except Exception as e:
         st.error(f"An error occurred during mapping: {e}")
         return
