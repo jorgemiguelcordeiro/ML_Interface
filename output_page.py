@@ -17,10 +17,15 @@ def output_page():
     except Exception as e:
         st.error(f"An error occurred while loading the model: {e}")
         return
+   
+
     # Debug: Inspect session state
     st.write("Session State at Output Page:", st.session_state.inputs)
 
+    
     # Debug: Inspect input data before processing
+    inputs = pd.DataFrame([st.session_state.inputs])  # Convert session state inputs to a DataFrame
+
     st.write("Raw Input Data at Output Page:", inputs)
 
     # Prepare input data
