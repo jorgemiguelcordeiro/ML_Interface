@@ -271,12 +271,12 @@ def output_page():
 
     # Apply wage and IME-4 count categories if columns exist
     if 'average_weekly_wage' in inputs.columns:
-        inputs['Wage Category'] = inputs['average_weekly_wage'].apply(categorize_wage)
+        inputs['average_weekly_wage'] = inputs['average_weekly_wage'].apply(categorize_wage)
     else:
         st.warning("'average_weekly_wage' column not found. Unable to categorize wage.")
 
     if 'ime4_count' in inputs.columns:
-        inputs['IME-4 Count Category'] = inputs['ime4_count'].apply(categorize_ime4_count)
+        inputs['ime4_count''] = inputs['ime4_count'].apply(categorize_ime4_count)
     else:
         st.warning("'ime4_count' column not found. Unable to categorize IME-4 count.")
 
