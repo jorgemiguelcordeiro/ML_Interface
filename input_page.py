@@ -1,8 +1,7 @@
 import streamlit as st
 import datetime
-import pandas as pd
 
-# Define your mapping dictionaries outside the function (as given by you)
+# Existing dictionary mappings (provided by you)
 industry_code_description_mapping = {
     "Service-Providing Industries": [
         'ARTS, ENTERTAINMENT, AND RECREATION', 'ACCOMMODATION AND FOOD SERVICES', 'INFORMATION', 
@@ -136,10 +135,38 @@ carrier_type_mapping = {
     ]
 }
 
+# Additional dictionary-based mappings for fields that previously had hard-coded values
+gender_mapping = {
+    "Male": ["Male"],
+    "Female": ["Female"]
+}
+
+adr_mapping = {
+    "Yes": ["Yes"],
+    "No": ["No"]
+}
+
+attorney_mapping = {
+    "Yes": ["Yes"],
+    "No": ["No"]
+}
+
+covid_mapping = {
+    "Yes": ["Yes"],
+    "No": ["No"]
+}
+
+# OIICS nature of injury description mapping (sample)
+oiics_nature_of_injury_description_mapping = {
+    "Fractures": ["Fractures"],
+    "Sprains": ["Sprains"],
+    "Cuts": ["Cuts"],
+    "Burns": ["Burns"]
+}
+
 def get_allowed_values(mapping_dict):
     allowed_values = []
     for key, values in mapping_dict.items():
-        # Filter out empty strings
         cleaned_values = [v for v in values if v.strip() != '']
         allowed_values.extend(cleaned_values)
     # Remove duplicates and sort
@@ -165,18 +192,17 @@ def input_page():
     st.title("Input Claim Data")
     st.write("Please provide the following information for the claim. Fields are organized for clarity. Hover over the info icons for additional details.")
 
-    # Flatten the allowed values for each dictionary-based field
+    # Flatten allowed values for each dictionary-based field
     allowed_industry_values = get_allowed_values(industry_code_description_mapping)
     allowed_wcio_nature_values = get_allowed_values(wcio_nature_of_injury_description_mapping)
     allowed_wcio_cause_values = get_allowed_values(wcio_cause_of_injury_description_mapping)
     allowed_wcio_body_values = get_allowed_values(wcio_part_of_body_description_mapping)
     allowed_carrier_values = get_allowed_values(carrier_type_mapping)
-
-    # Allowed values for simple binary fields
-    allowed_gender_values = ['Male', 'Female']
-    allowed_adr_values = ['Yes', 'No']
-    allowed_attorney_values = ['Yes', 'No']
-    allowed_covid_values = ['Yes', 'No']
+    allowed_gender_values = get_allowed_values(gender_mapping)
+    allowed_adr_values = get_allowed_values(adr_mapping)
+    allowed_attorney_values = get_allowed_values(attorney_mapping)
+    allowed_covid_values = get_allowed_values(covid_mapping)
+    allowed_oiics_values = get_allowed_values(oiics_nature_of_injury_description_mapping)
 
     # Group 1: Dates & Basic Identifiers
     with st.expander("Basic Claim Details"):
@@ -190,9 +216,7 @@ def input_page():
             c3_date = st.date_input("C-3 Date", value=datetime.date.today(), help="Date Employee Claim Form (C-3) was received.")
             first_hearing_date = st.date_input("First Hearing Date", value=datetime.date.today(), help="Date of the first hearing on the claim.")
 
-    # Get the current year
     current_year = datetime.date.today().year
-    # Calculate the minimum allowed birth year
     min_birth_year = current_year - 80
 
     # Group 2: Personal & Employment Details
@@ -221,7 +245,6 @@ def input_page():
             medical_fee_regions = ["Upstate", "Downstate", "NYC"]
             medical_fee_region = st.selectbox("Medical Fee Region", medical_fee_regions, help="Region where the injured worker receives medical service.")
             industry_code = st.text_input("Industry Code", placeholder="e.g., 561320", help="NAICS code for the employer's industry.")
-            # Use the allowed values from industry_code_description_mapping
             industry_code_description = st.selectbox("Industry Code Description", allowed_industry_values, help="2-digit NAICS description of the employer's industry.")
 
     # Group 4: Injury Specifics
@@ -230,30 +253,19 @@ def input_page():
         with col7:
             covid_19_indicator = st.selectbox("COVID-19 Indicator", allowed_covid_values, help="Indicate if the claim may be associated with COVID-19.")
             ime4_count = st.number_input("IME-4 Count", min_value=0, value=0, help="Number of IME-4 forms received (Independent Examiner's Report).")
-
-            # OIICS nature of injury description not provided by mapping, leaving as is
-            oiics_nature_options = ["Fractures", "Sprains", "Cuts", "Burns"]
-            oiics_nature_of_injury_description = st.selectbox("OIICS Nature of Injury Description", oiics_nature_options, help="OIICS code describing the nature of injury.")
+            oiics_nature_of_injury_description = st.selectbox("OIICS Nature of Injury Description", allowed_oiics_values, help="OIICS code describing the nature of injury.")
 
         with col8:
             wcio_cause_of_injury_code = st.text_input("WCIO Cause of Injury Code", placeholder="e.g., 03", help="WCIO code representing the cause of injury.")
-            # Use allowed values from wcio_cause_of_injury_description_mapping
             wcio_cause_of_injury_description = st.selectbox("WCIO Cause of Injury Description", allowed_wcio_cause_values, help="Description of the cause of injury.")
             wcio_nature_of_injury_code = st.text_input("WCIO Nature of Injury Code", placeholder="e.g., 30", help="WCIO code representing the nature of injury.")
-            # Use allowed values from wcio_nature_of_injury_description_mapping
             wcio_nature_of_injury_description = st.selectbox("WCIO Nature of Injury Description", allowed_wcio_nature_values, help="Description of the nature of injury.")
             wcio_part_of_body_code = st.text_input("WCIO Part Of Body Code", placeholder="e.g., 15", help="WCIO code for affected part of body.")
-            # Use allowed values from wcio_part_of_body_description_mapping
             wcio_part_of_body_description = st.selectbox("WCIO Part Of Body Description", allowed_wcio_body_values, help="Description of the affected body part.")
 
     # Group 5: Carrier & Claim Details
     with st.expander("Carrier & Claim"):
-        # Now use allowed_carrier_values from carrier_type_mapping
         carrier_name = st.selectbox("Carrier Name", allowed_carrier_values, help="Primary insurance provider responsible for coverage from allowed values.")
-        # Since carrier_type is determined by the carrier_name selection, you may choose to remove or keep this field.
-        # If you want to keep it, just leave it as a text input or remove it.
-        # For clarity, let's remove it since the dictionary handles carrier categories.
-        # carrier_type = st.selectbox("Carrier Type", ["Insurance Company", "Self-Insured Employer", "Group Self-Insurer", "State Insurance Fund"], help="Type of insurance provider.")
 
     # Collect all inputs into a dictionary
     inputs = {
@@ -267,7 +279,6 @@ def input_page():
         'c2_date': c2_date,
         'c3_date': c3_date,
         'carrier_name': carrier_name,
-        # 'carrier_type': carrier_type, # Removed since we now only select carrier_name from known values.
         'county_of_injury': county_of_injury,
         'covid_19_indicator': covid_19_indicator,
         'district_name': district_name,
@@ -292,8 +303,3 @@ def input_page():
         st.session_state.inputs = inputs
         st.session_state.page = "output"
         st.success("Your data has been submitted! You will be redirected to the output page.")
-
-
-
-
-
