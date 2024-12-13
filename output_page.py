@@ -42,7 +42,7 @@ def output_page():
     st.write("**Columns before dropping unused columns:**", inputs.columns.tolist())
 
     # Drop unused columns if present
-    unused_columns = ['OIICS Nature of Injury Description']
+    unused_columns = ['oiics_nature_of_injury_description']
     inputs = inputs.drop(columns=unused_columns, errors='ignore')
 
     # Debug: Show columns after dropping unused columns
