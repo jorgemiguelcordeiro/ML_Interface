@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import os
+
+
 def output_page():
     st.title("Prediction Result")
 
@@ -17,44 +18,53 @@ def output_page():
     except Exception as e:
         st.error(f"An error occurred while loading the model: {e}")
         return
-   
+
+    # Check if session state contains inputs
+    if 'inputs' not in st.session_state:
+        st.error("No input data found in session state. Please return to the input page.")
+        return
 
     # Debug: Inspect session state
     st.write("Session State at Output Page:", st.session_state.inputs)
 
-    
-    # Debug: Inspect input data before processing
+    # Prepare input data
     inputs = pd.DataFrame([st.session_state.inputs])  # Convert session state inputs to a DataFrame
 
-    st.write("Raw Input Data at Output Page:", inputs)
-
-    # Prepare input data
-    inputs = pd.DataFrame([st.session_state.inputs])
+    # Debug: Inspect raw input data
+    st.write("Raw Input Data Before Processing:", inputs)
 
     # Drop unused columns
     unused_columns = ['OIICS Nature of Injury Description']
     inputs = inputs.drop(columns=unused_columns, errors='ignore')
 
-    # Add missing columns
+    # Add missing columns with default values
     required_columns = ['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']
     for col in required_columns:
         if col not in inputs.columns:
             st.warning(f"'{col}' is missing. Adding it with default values.")
-            inputs[col] = 0
+            inputs[col] = 0  # Replace `0` with appropriate default values, if necessary
 
-    # Apply mappings
+    # Debug: Inspect input data after adding missing columns
+    st.write("Input Data After Adding Missing Columns:", inputs)
+
+    # Apply mappings to convert categorical variables into numerical representations
     try:
-        inputs['Gender'] = inputs['Gender'].map({'Female': 0, 'Male': 1}).fillna(0)
-        inputs['Alternative Dispute Resolution'] = inputs['Alternative Dispute Resolution'].map({'Yes': 1, 'No': 0}).fillna(0)
-        inputs['Attorney/Representative'] = inputs['Attorney/Representative'].map({'No': 0, 'Yes': 1}).fillna(0)
-        inputs['COVID-19 Indicator'] = inputs['COVID-19 Indicator'].map({'No': 0, 'Yes': 1}).fillna(0)
+        if 'Gender' in inputs.columns:
+            inputs['Gender'] = inputs['Gender'].map({'Female': 0, 'Male': 1}).fillna(0)
+        if 'Alternative Dispute Resolution' in inputs.columns:
+            inputs['Alternative Dispute Resolution'] = inputs['Alternative Dispute Resolution'].map({'Yes': 1, 'No': 0}).fillna(0)
+        if 'Attorney/Representative' in inputs.columns:
+            inputs['Attorney/Representative'] = inputs['Attorney/Representative'].map({'No': 0, 'Yes': 1}).fillna(0)
+        if 'COVID-19 Indicator' in inputs.columns:
+            inputs['COVID-19 Indicator'] = inputs['COVID-19 Indicator'].map({'No': 0, 'Yes': 1}).fillna(0)
     except Exception as e:
         st.error(f"An error occurred during mapping: {e}")
         return
 
+    # Debug: Inspect processed input data
     st.write("Processed Input Data:", inputs)
 
-    # Prediction
+    # Perform prediction
     try:
         prediction = model.predict(inputs)[0]
         st.subheader(f"The predicted Claim Injury Type is: **{prediction}**")
@@ -71,6 +81,4 @@ def output_page():
     # Navigation
     if st.button("Return to Welcome Page"):
         st.session_state.page = 'welcome'
-
-
 
