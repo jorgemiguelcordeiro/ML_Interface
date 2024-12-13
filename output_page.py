@@ -30,6 +30,7 @@ def output_page():
 
     # Debug: Inspect raw input data
     st.write("Raw Input Data Before Processing:", inputs)
+    st.write("Raw Input Data Before Mapping:", inputs[['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']])
 
     # Drop unused columns
     unused_columns = ['OIICS Nature of Injury Description']
@@ -51,6 +52,7 @@ def output_page():
 
     # Debug: Inspect processed input data
     st.write("Processed Input Data:", inputs)
+    st.write("Processed Data After Mapping:", inputs[['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']])
 
     # Perform prediction
     try:
