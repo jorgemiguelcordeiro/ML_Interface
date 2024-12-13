@@ -29,7 +29,17 @@ def output_page():
     # Debug: Inspect raw input data
     st.write("Raw Input Data Before Processing:", inputs)
     
-
+   # Debug: Check why required columns might be missing
+    required_columns = ['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']
+    for col in required_columns:
+        if col not in inputs.columns:
+            st.warning(f"'{col}' column is missing from the inputs. Adding it with default value 0.")
+        # Debugging missing column
+            if col not in st.session_state.inputs:
+                st.error(f"'{col}' is not present in st.session_state.inputs. Check the input page to ensure this field is captured correctly.")
+            else:
+                st.error(f"'{col}' exists in st.session_state.inputs but is not included in the DataFrame. Possible data conversion issue.")
+        
 
     # Drop unused columns
     unused_columns = ['OIICS Nature of Injury Description']
