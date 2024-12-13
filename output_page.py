@@ -42,7 +42,7 @@ def output_page():
     for col in required_columns:
         if col not in inputs.columns:
             st.warning(f"'{col}' is missing. Adding it with default values.")
-            inputs[col] = 0  # Replace `0` with appropriate default values, if necessary
+           
 
     # Debug: Inspect input data after adding missing columns
     st.write("Input Data After Adding Missing Columns:", inputs)
