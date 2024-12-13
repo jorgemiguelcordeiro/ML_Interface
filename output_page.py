@@ -50,6 +50,11 @@ def output_page():
         input_data['Attorney/Representative'] = input_data['Attorney/Representative'].map({'No': 0, 'Yes': 1}).fillna(0)
     else:
         st.warning("'Attorney/Representative' column is missing in the input data.")
+    # Apply mapping for 'COVID-19 Indicator' if it exists
+    if 'COVID-19 Indicator' in input_data.columns:
+        input_data['COVID-19 Indicator'] = input_data['COVID-19 Indicator'].map({'No': 0, 'Yes': 1}).fillna(0)
+    else:
+        st.warning("'COVID-19 Indicator' column is missing in the input data.")
 
     st.write("Processed Input Data:", input_data)
 
