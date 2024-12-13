@@ -36,10 +36,6 @@ def output_page():
     # Drop unused columns
     unused_columns = ['OIICS Nature of Injury Description']
     inputs = inputs.drop(columns=unused_columns, errors='ignore')
-           
-
-    # Debug: Inspect input data after adding missing columns
-    st.write("Input Data After Adding Missing Columns:", inputs)
 
     # Apply mappings to convert categorical variables into numerical representations
     try:
