@@ -36,12 +36,6 @@ def output_page():
     # Drop unused columns
     unused_columns = ['OIICS Nature of Injury Description']
     inputs = inputs.drop(columns=unused_columns, errors='ignore')
-
-    # Add missing columns with default values
-    required_columns = ['Gender', 'Alternative Dispute Resolution', 'Attorney/Representative', 'COVID-19 Indicator']
-    for col in required_columns:
-        if col not in inputs.columns:
-            st.warning(f"'{col}' is missing. Adding it with default values.")
            
 
     # Debug: Inspect input data after adding missing columns
