@@ -281,6 +281,32 @@ def output_page():
 
     st.write("**Processed Input Data After Categorization:**", inputs)
 
+
+
+
+    
+    # Check column alignment
+    expected_columns = model.feature_names_in_  # or load from a saved list if needed
+    current_columns = inputs.columns
+
+    missing_columns = [col for col in expected_columns if col not in current_columns]
+    extra_columns = [col for col in current_columns if col not in expected_columns]
+
+    if missing_columns:
+        st.write("The following columns were expected by the model but are missing in the input data:")
+        for col in missing_columns:
+            st.write(f"  - {col}")
+        st.write("These missing columns indicate that you haven't reproduced the training preprocessing steps.")
+
+    if extra_columns:
+        st.write("The following columns are present in the input but were not seen during training:")
+        for col in extra_columns:
+            st.write(f"  - {col}")
+        st.write("These extra columns suggest that you're providing features not seen by the model during training.")
+
+    # If everything looks correct, proceed to prediction
+    prediction = model.predict(inputs)[0]
+
     # Perform prediction
     try:
         prediction = model.predict(inputs)[0]
