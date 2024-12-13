@@ -34,10 +34,6 @@ def input_page():
             c3_date = st.date_input("C-3 Date", value=datetime.date.today(), help="Date Employee Claim Form (C-3) was received.")
             first_hearing_date = st.date_input("First Hearing Date", value=datetime.date.today(), help="Date of the first hearing on the claim.")
     
-
-
-
-
     # Get the current year
     current_year = datetime.date.today().year
 
@@ -48,7 +44,7 @@ def input_page():
         col3, col4 = st.columns(2)
 
         with col3:
-            age_at_injury = st.number_input("Age at Injury", min_value=10, max_value=80, value=30, help="Age of the injured worker at the time of injury.")
+            age_at_injury = st.number_input("Age at Injury", min_value=10, max_value=80, value=30, help="Age of the injured worker at the time of injury. The age has to be between 10 and 80.")
             birth_year = st.number_input("Birth Year",min_value=min_birth_year,max_value=current_year,value=min_birth_year, help="Year of birth of the injured worker (must be within the last 80 years).")
             gender = st.selectbox("Gender", ["Male", "Female"], help="Gender of the injured worker.")
             average_weekly_wage = st.number_input("Average Weekly Wage ($)", min_value=0.0, value=1000.0, help="Wage used to calculate benefits.")
