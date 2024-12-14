@@ -209,6 +209,10 @@ def output_page():
         st.error("No input data found in session state. Please return to the input page.")
         return
 
+    # Convert session state inputs to DataFrame
+    inputs = pd.DataFrame([st.session_state.inputs])  
+    
+
     # Define the required columns based on your updated dataset
     required_columns = [
         'Gender', 'Alternative Dispute Resolution', 
