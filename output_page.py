@@ -211,7 +211,9 @@ def output_page():
 
     # Convert session state inputs to DataFrame
     inputs = pd.DataFrame([st.session_state.inputs])  
-    
+     
+    # Debug: Show raw input data
+    st.write("**Raw Input Data Before Processing:**", inputs)
 
     # Define the required columns based on your updated dataset
     required_columns = [
