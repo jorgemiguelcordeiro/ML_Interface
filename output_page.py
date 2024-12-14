@@ -4,10 +4,11 @@
 #Importing the libraries
 import streamlit as st
 import joblib
-import zipfile, io
+import zipfile
 import pandas as pd
 import numpy as np
 '''
+import io
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer, KNNImputer
 import matplotlib.pyplot as plt
