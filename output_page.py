@@ -44,7 +44,7 @@ z.extractall()
 del z
 # Load datasets
 train_data = pd.read_csv("train_data.csv")
-print('Train df shape:', train_data.shape)
+st.write('Train df shape:', train_data.shape)
 
 def output_page():
     st.title("Prediction Result")
