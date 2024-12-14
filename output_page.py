@@ -7,6 +7,7 @@ import joblib
 import zipfile, io
 import pandas as pd
 import numpy as np
+'''
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer, KNNImputer
 import matplotlib.pyplot as plt
@@ -38,7 +39,7 @@ from sklearn.naive_bayes import GaussianNB
 
 import warnings
 from imblearn.over_sampling import SMOTE
-
+'''
 # Define your mapping dictionaries outside the function
 industry_code_description_mapping = {
     "Service-Providing Industries": [
