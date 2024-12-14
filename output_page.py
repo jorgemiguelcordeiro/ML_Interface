@@ -249,10 +249,13 @@ def output_page():
         return
     # Set Claim Identifier as the index for both datasets
     train_data.set_index('Claim Identifier', inplace=True)
+    train_to_split = train_data.copy()
+    columns_of_interest = train_to_split.columns[train_to_split.isnull().sum() == 19445]
+    # Drop rows where all columns in columns_of_interest have NaN values
+    train_to_split = train_to_split.dropna(subset=columns_of_interest, how='all')
+    train_to_split = train_to_split.drop(columns = 'OIICS Nature of Injury Description')
 
-      
-
-
+    X = train_to_split.drop(columns= ['Agreement Reached','WCB Decision', 'Claim Injury Type'])
 
     
     # Load the model from a .joblib file
