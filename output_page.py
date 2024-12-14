@@ -166,20 +166,20 @@ def categorize_wage(x):
             return 'High Income (> Upper Fence)'
         debug_step("categorize_wage", df)
 
-    def categorize_ime4_count(count):
-        if pd.isna(count) or count < 0:
-            return 'Invalid'
-        elif count < 1:
-            return "Low IME-4 Count"
-        elif 1 <= count <= 2:
-            return "Low IME-4 Count"
-        elif 2 < count <= 4:
-            return "Medium IME-4 Count"
-        elif 4 < count <= 8.5:
-            return "High IME-4 Count"
-        else:
-            return "Very High IME-4 Count"
-        debug_step("categorize_ime4_count", df)
+def categorize_ime4_count(count):
+    if pd.isna(count) or count < 0:
+        return 'Invalid'
+    elif count < 1:
+        return "Low IME-4 Count"
+    elif 1 <= count <= 2:
+        return "Low IME-4 Count"
+    elif 2 < count <= 4:
+        return "Medium IME-4 Count"
+    elif 4 < count <= 8.5:
+        return "High IME-4 Count"
+    else:
+        return "Very High IME-4 Count"
+    debug_step("categorize_ime4_count", df)
 
 
 
