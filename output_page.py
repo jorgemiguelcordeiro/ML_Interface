@@ -3,6 +3,7 @@
 import zipfile, io
 import pandas as pd
 import numpy as np
+import streamlit as st
 
 # Define your mapping dictionaries outside the function
 industry_code_description_mapping = {
