@@ -219,7 +219,7 @@ def categorize_ime4_count(count):
 
 
 def output_page():
-  
+  '''
     st.title("Prediction Result")
 
     # === SECTION 1: Data loading ==
@@ -262,7 +262,7 @@ def output_page():
     train_to_split = train_to_split.drop(columns = 'OIICS Nature of Injury Description')
 
     X = train_to_split.drop(columns= ['Agreement Reached','WCB Decision', 'Claim Injury Type')
-
+'''
     
     # Load the model from a .joblib file
     model_path = 'logistic_model.joblib'
