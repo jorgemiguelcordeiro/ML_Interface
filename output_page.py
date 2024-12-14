@@ -249,7 +249,7 @@ def output_page():
         return
     # Set Claim Identifier as the index for both datasets
     train_data.set_index('Claim Identifier', inplace=True)
-    train_to_split = train_data.copy()
+
       
 
 
