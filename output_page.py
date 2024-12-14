@@ -219,16 +219,24 @@ def categorize_ime4_count(count):
 
 
 def output_page():
-    # Extract the contents of the zip file
+    # Define the zip file and expected CSV file
     zip_file = "train_data.zip"  # Ensure the zip file is in the same directory
     csv_file = "train_data.csv"
+
+    # Extract the contents of the zip file
     try:
-        z = zipfile.ZipFile(zip_file)
-        z.extractall()
-        del z
-        st.success(f"Successfully extracted '{zip_file}'.")
+        with zipfile.ZipFile(zip_file, 'r') as z:
+            if csv_file in z.namelist():
+                z.extractall()
+                st.success(f"Successfully extracted '{csv_file}' from '{zip_file}'.")
+            else:
+                st.error(f"'{csv_file}' not found in '{zip_file}'.")
+                return
     except FileNotFoundError:
         st.error(f"Zip file '{zip_file}' not found. Ensure it is in the correct directory.")
+        return
+    except zipfile.BadZipFile:
+        st.error(f"'{zip_file}' is not a valid zip file.")
         return
     except Exception as e:
         st.error(f"An error occurred while extracting '{zip_file}': {e}")
@@ -244,19 +252,53 @@ def output_page():
     except FileNotFoundError:
         st.error(f"CSV file '{csv_file}' not found after extraction. Please verify the zip contents.")
         return
+    except pd.errors.EmptyDataError:
+        st.error(f"CSV file '{csv_file}' is empty.")
+        return
+    except pd.errors.ParserError:
+        st.error(f"CSV file '{csv_file}' could not be parsed. Please ensure it is a valid CSV file.")
+        return
     except Exception as e:
         st.error(f"An error occurred while loading the dataset: {e}")
         return
-    # Set Claim Identifier as the index for both datasets
-    train_data.set_index('Claim Identifier', inplace=True)
+
+    # Set 'Claim Identifier' as the index for the dataset
+    try:
+        train_data.set_index('Claim Identifier', inplace=True)
+        st.success("'Claim Identifier' set as the index.")
+    except KeyError:
+        st.error("'Claim Identifier' column not found in the dataset. Please verify the dataset structure.")
+        return
+
+    # Copy and process the dataset
     train_to_split = train_data.copy()
-    columns_of_interest = train_to_split.columns[train_to_split.isnull().sum() == 19445]
-    # Drop rows where all columns in columns_of_interest have NaN values
-    train_to_split = train_to_split.dropna(subset=columns_of_interest, how='all')
-    train_to_split = train_to_split.drop(columns = 'OIICS Nature of Injury Description')
 
-    X = train_to_split.drop(columns= ['Agreement Reached','WCB Decision', 'Claim Injury Type'])
+    # Handle columns of interest with all missing values
+    columns_of_interest = train_to_split.columns[train_to_split.isnull().sum() == train_to_split.shape[0]]
+    if columns_of_interest.empty:
+        st.warning("No columns with all missing values found.")
+    else:
+        train_to_split = train_to_split.dropna(subset=columns_of_interest, how='all')
+        st.info(f"Dropped rows where all columns in {columns_of_interest.tolist()} have NaN values.")
 
+    # Drop unused columns
+    try:
+        train_to_split = train_to_split.drop(columns=['OIICS Nature of Injury Description'], errors='ignore')
+        st.info("Dropped 'OIICS Nature of Injury Description' column.")
+    except KeyError:
+        st.warning("'OIICS Nature of Injury Description' column not found.")
+
+    # Define features (X) by excluding target columns
+    try:
+        X = train_to_split.drop(columns=['Agreement Reached', 'WCB Decision', 'Claim Injury Type'], errors='ignore')
+        st.success("Feature matrix (X) created by excluding target columns.")
+        st.write("Feature Matrix:")
+        st.dataframe(X.head())
+    except KeyError as e:
+        st.error(f"An error occurred while creating the feature matrix: {e}")
+        return
+
+    st.success("Data loading completed.")
     
     # Load the model from a .joblib file
     model_path = 'logistic_model.joblib'
