@@ -36,18 +36,43 @@ from sklearn.naive_bayes import GaussianNB
 import warnings
 from imblearn.over_sampling import SMOTE
 
-# === SECTION 1: Data loading ===
 
-z = zipfile.ZipFile("train_data.zip") #we loaded the project data folder zip in the same
-#environment and use this code to extract the components
-z.extractall()
-del z
-# Load datasets
-train_data = pd.read_csv("train_data.csv")
-st.write('Train df shape:', train_data.shape)
 
 def output_page():
+  
     st.title("Prediction Result")
+
+    # === SECTION 1: Data loading ==
+  
+    # Extract the contents of the zip file
+    zip_file = "train_data.zip"  # Ensure the zip file is in the same directory
+    csv_file = "train_data.csv"
+    try:
+        z = zipfile.ZipFile(zip_file)
+        z.extractall()
+        del z
+        st.success(f"Successfully extracted '{zip_file}'.")
+    except FileNotFoundError:
+        st.error(f"Zip file '{zip_file}' not found. Ensure it is in the correct directory.")
+        return
+    except Exception as e:
+        st.error(f"An error occurred while extracting '{zip_file}': {e}")
+        return
+
+    # Load the dataset
+    try:
+        train_data = pd.read_csv(csv_file)
+        st.success("Dataset loaded successfully.")
+        st.write(f"Number of rows: {train_data.shape[0]}, Number of columns: {train_data.shape[1]}")
+        st.write("Sample Data:")
+        st.dataframe(train_data.head())  # Use Streamlit's dataframe widget for a cleaner display
+    except FileNotFoundError:
+        st.error(f"CSV file '{csv_file}' not found after extraction. Please verify the zip contents.")
+        return
+    except Exception as e:
+        st.error(f"An error occurred while loading the dataset: {e}")
+        return
+
 
     # Load the model from a .joblib file
     model_path = 'logistic_model.joblib'
