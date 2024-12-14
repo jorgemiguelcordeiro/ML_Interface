@@ -102,21 +102,16 @@ def output_page():
         st.error("No input data found in session state. Please return to the input page.")
         return
 
-    # Convert session state inputs to DataFrame
-    inputs = pd.DataFrame([st.session_state.inputs])  
-    
-    st.write("**Raw Input Data Before Processing:**", inputs)
-
-    # Example of required columns
+    # Define the required columns based on your updated dataset
     required_columns = [
-        'gender', 'alternative_dispute_resolution', 
-        'attorney_representative', 'covid_19_indicator', 
-        'industry_code_description', 'wcio_nature_of_injury_description',
-        'wcio_cause_of_injury_description', 'wcio_part_of_body_description', 'carrier_name'
+        'Gender', 'Alternative Dispute Resolution', 
+        'Attorney/Representative', 'COVID-19 Indicator', 
+        'Industry Code Description', 'WCIO Nature of Injury Description',
+        'WCIO Cause of Injury Description', 'WCIO Part Of Body Description', 'Carrier Name'
     ]
-    
-    missing_required_cols = [col for col in required_columns if col not in inputs.columns]
 
+    # Check for missing columns
+    missing_required_cols = [col for col in required_columns if col not in inputs.columns]
     if missing_required_cols:
         for col in missing_required_cols:
             st.warning(f"'{col}' column is missing from the inputs. Please ensure it is captured in the input page.")
@@ -125,69 +120,52 @@ def output_page():
     unused_columns = ['OIICS Nature of Injury Description']  # adjust or remove if needed
     inputs = inputs.drop(columns=unused_columns, errors='ignore')
 
-    # Map categorical values (gender, etc.)
+    # Map categorical values (Gender, etc.)
     gender_map = {'Female': 0, 'Male': 1}
-    if 'gender' in inputs.columns:
-        inputs['gender'] = inputs['gender'].map(gender_map)
+    if 'Gender' in inputs.columns:
+        inputs['Gender'] = inputs['Gender'].map(gender_map)
 
     covid_map = {'No': 0, 'Yes': 1}
-    if 'covid_19_indicator' in inputs.columns:
-        inputs['covid_19_indicator'] = inputs['covid_19_indicator'].map(covid_map)
+    if 'COVID-19 Indicator' in inputs.columns:
+        inputs['COVID-19 Indicator'] = inputs['COVID-19 Indicator'].map(covid_map)
 
     adr_map = {'Yes': 1, 'No': 0}
-    if 'alternative_dispute_resolution' in inputs.columns:
-        inputs['alternative_dispute_resolution'] = inputs['alternative_dispute_resolution'].map(adr_map)
+    if 'Alternative Dispute Resolution' in inputs.columns:
+        inputs['Alternative Dispute Resolution'] = inputs['Alternative Dispute Resolution'].map(adr_map)
 
     attorney_map = {'No': 0, 'Yes': 1}
-    if 'attorney_representative' in inputs.columns:
-        inputs['attorney_representative'] = inputs['attorney_representative'].map(attorney_map)
+    if 'Attorney/Representative' in inputs.columns:
+        inputs['Attorney/Representative'] = inputs['Attorney/Representative'].map(attorney_map)
 
     # Apply dictionary-based category mappings
-    if 'industry_code_description' in inputs.columns:
-        inputs['industry_code_description'] = inputs['industry_code_description'].apply(
+    if 'Industry Code Description' in inputs.columns:
+        inputs['Industry Code Description'] = inputs['Industry Code Description'].apply(
             lambda x: map_value_to_category(x, industry_code_description_mapping)
         )
 
-    if 'wcio_nature_of_injury_description' in inputs.columns:
-        inputs['wcio_nature_of_injury_description'] = inputs['wcio_nature_of_injury_description'].apply(
+    if 'WCIO Nature of Injury Description' in inputs.columns:
+        inputs['WCIO Nature of Injury Description'] = inputs['WCIO Nature of Injury Description'].apply(
             lambda x: map_value_to_category(x, wcio_nature_of_injury_description_mapping)
         )
 
-    if 'wcio_cause_of_injury_description' in inputs.columns:
-        inputs['wcio_cause_of_injury_description'] = inputs['wcio_cause_of_injury_description'].apply(
+    if 'WCIO Cause of Injury Description' in inputs.columns:
+        inputs['WCIO Cause of Injury Description'] = inputs['WCIO Cause of Injury Description'].apply(
             lambda x: map_value_to_category(x, wcio_cause_of_injury_description_mapping)
         )
 
-    if 'wcio_part_of_body_description' in inputs.columns:
-        inputs['wcio_part_of_body_description'] = inputs['wcio_part_of_body_description'].apply(
+    if 'WCIO Part Of Body Description' in inputs.columns:
+        inputs['WCIO Part Of Body Description'] = inputs['WCIO Part Of Body Description'].apply(
             lambda x: map_value_to_category(x, wcio_part_of_body_description_mapping)
         )
 
-    if 'carrier_name' in inputs.columns:
-        inputs['carrier_name'] = inputs['carrier_name'].apply(
+    if 'Carrier Name' in inputs.columns:
+        inputs['Carrier Name'] = inputs['Carrier Name'].apply(
             lambda x: map_value_to_category(x, carrier_type_mapping)
         )
 
-    #st.write("**Processed Input Data Before Categorization:**", inputs)
+    st.write("**Processed Input Data After Mapping:**", inputs)
 
-    # Apply wage and IME-4 count categories if columns exist
-    if 'average_weekly_wage' in inputs.columns:
-        inputs['average_weekly_wage'] = inputs['average_weekly_wage'].apply(categorize_wage)
-    else:
-        st.warning("'average_weekly_wage' column not found. Unable to categorize wage.")
-
-    if 'ime4_count' in inputs.columns:
-        inputs['ime4_count'] = inputs['ime4_count'].apply(categorize_ime4_count)
-    else:
-        st.warning("'ime4_count' column not found. Unable to categorize IME-4 count.")
-
-    st.write("**Processed Input Data After Categorization:**", inputs)
-
-
-
-
-    
-    # Check column alignment
+    # Check column alignment with the model
     expected_columns = model.feature_names_in_  # or load from a saved list if needed
     current_columns = inputs.columns
 
@@ -206,9 +184,6 @@ def output_page():
             st.write(f"  - {col}")
         st.write("These extra columns suggest that you're providing features not seen by the model during training.")
 
-    # If everything looks correct, proceed to prediction
-    prediction = model.predict(inputs)[0]
-
     # Perform prediction
     try:
         prediction = model.predict(inputs)[0]
@@ -225,6 +200,5 @@ def output_page():
     # Navigation
     if st.button("Return to Welcome Page"):
         st.session_state.page = 'welcome'
-
 
 
