@@ -247,6 +247,9 @@ def output_page():
     except Exception as e:
         st.error(f"An error occurred while loading the dataset: {e}")
         return
+    # Set Claim Identifier as the index for both datasets
+    train_data.set_index('Claim Identifier', inplace=True)
+    train_to_split = train_data.copy()
       
 
 
