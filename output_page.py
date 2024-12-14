@@ -1,4 +1,4 @@
-!pip install streamlit joblib pandas numpy scikit-learn matplotlib seaborn imbalanced-learn
+
 
 
 #Importing the libraries
