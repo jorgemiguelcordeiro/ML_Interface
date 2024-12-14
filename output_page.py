@@ -1,47 +1,10 @@
 
-
-
 #Importing the libraries
 import streamlit as st
 import joblib
 
 import pandas as pd
 import numpy as np
-'''
-import zipfile
-import io
-from sklearn.model_selection import train_test_split
-from sklearn.impute import SimpleImputer, KNNImputer
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.impute import SimpleImputer
-from sklearn.model_selection import cross_validate
-from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
-                             f1_score)
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import time
-from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier, VotingClassifier, GradientBoostingClassifier, StackingClassifier
-from sklearn.svm import SVC  
-from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import VotingClassifier
-from sklearn.model_selection import StratifiedKFold
-from sklearn.linear_model import LassoCV
-from sklearn.feature_selection import mutual_info_classif
-from sklearn.feature_selection import SelectFromModel
-from sklearn.model_selection import GridSearchCV
-from sklearn.naive_bayes import GaussianNB
-
-import warnings
-from imblearn.over_sampling import SMOTE
-'''
 # Define your mapping dictionaries outside the function
 industry_code_description_mapping = {
     "Service-Providing Industries": [
@@ -222,51 +185,7 @@ def categorize_ime4_count(count):
 
 
 def output_page():
-  '''
-    st.title("Prediction Result")
-
-    # === SECTION 1: Data loading ==
-    # Extract the contents of the zip file
-    zip_file = "train_data.zip"  # Ensure the zip file is in the same directory
-    csv_file = "train_data.csv"
-    try:
-        z = zipfile.ZipFile(zip_file)
-        z.extractall()
-        del z
-        st.success(f"Successfully extracted '{zip_file}'.")
-    except FileNotFoundError:
-        st.error(f"Zip file '{zip_file}' not found. Ensure it is in the correct directory.")
-        return
-    except Exception as e:
-        st.error(f"An error occurred while extracting '{zip_file}': {e}")
-        return
-
-    # Load the dataset
-    try:
-        train_data = pd.read_csv(csv_file)
-        st.success("Dataset loaded successfully.")
-        st.write(f"Number of rows: {train_data.shape[0]}, Number of columns: {train_data.shape[1]}")
-        st.write("Sample Data:")
-        st.dataframe(train_data.head())  # Use Streamlit's dataframe widget for a cleaner display
-    except FileNotFoundError:
-        st.error(f"CSV file '{csv_file}' not found after extraction. Please verify the zip contents.")
-        return
-    except Exception as e:
-        st.error(f"An error occurred while loading the dataset: {e}")
-        return
-      
-    # Set Claim Identifier as the index for both datasets
-    train_data.set_index('Claim Identifier', inplace=True)
-    train_to_split = train_data.copy()
-
-    columns_of_interest = train_to_split.columns[train_to_split.isnull().sum() == 19445]
-    # Drop rows where all columns in columns_of_interest have NaN values
-    train_to_split = train_to_split.dropna(subset=columns_of_interest, how='all')
-    train_to_split = train_to_split.drop(columns = 'OIICS Nature of Injury Description')
-
-    X = train_to_split.drop(columns= ['Agreement Reached','WCB Decision', 'Claim Injury Type')
-'''
-    
+  
     # Load the model from a .joblib file
     model_path = 'logistic_model.joblib'
     try:
