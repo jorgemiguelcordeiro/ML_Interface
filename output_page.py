@@ -38,8 +38,13 @@ from imblearn.over_sampling import SMOTE
 
 # === SECTION 1: Data loading ===
 
-
-
+z = zipfile.ZipFile("train_data.zip") #we loaded the project data folder zip in the same
+#environment and use this code to extract the components
+z.extractall()
+del z
+# Load datasets
+train_data = pd.read_csv("train_data.csv")
+print('Train df shape:', train_data.shape)
 
 def output_page():
     st.title("Prediction Result")
