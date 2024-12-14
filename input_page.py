@@ -174,6 +174,9 @@ def get_allowed_values(mapping_dict):
     allowed_values.sort()
     return allowed_values
 
+import streamlit as st
+import datetime
+
 def input_page():
     # Sidebar branding/instructions
     st.sidebar.image("New York Workers' Compensation Board (WCB).png", use_column_width=True)  # Replace with your logo
@@ -191,18 +194,6 @@ def input_page():
     )
     st.title("Input Claim Data")
     st.write("Please provide the following information for the claim. Fields are organized for clarity. Hover over the info icons for additional details.")
-
-    # Flatten allowed values for each dictionary-based field
-    allowed_industry_values = get_allowed_values(industry_code_description_mapping)
-    allowed_wcio_nature_values = get_allowed_values(wcio_nature_of_injury_description_mapping)
-    allowed_wcio_cause_values = get_allowed_values(wcio_cause_of_injury_description_mapping)
-    allowed_wcio_body_values = get_allowed_values(wcio_part_of_body_description_mapping)
-    allowed_carrier_values = get_allowed_values(carrier_type_mapping)
-    allowed_gender_values = get_allowed_values(gender_mapping)
-    allowed_adr_values = get_allowed_values(adr_mapping)
-    allowed_attorney_values = get_allowed_values(attorney_mapping)
-    allowed_covid_values = get_allowed_values(covid_mapping)
-    allowed_oiics_values = get_allowed_values(oiics_nature_of_injury_description_mapping)
 
     # Group 1: Dates & Basic Identifiers
     with st.expander("Basic Claim Details"):
@@ -223,14 +214,14 @@ def input_page():
     with st.expander("Personal & Employment Details"):
         col3, col4 = st.columns(2)
         with col3:
-            age_at_injury = st.number_input("Age at Injury", min_value=10, max_value=80, value=30, help="Age of the injured worker at the time of injury. The age has to be between 10 and 80.")
-            birth_year = st.number_input("Birth Year", min_value=min_birth_year, max_value=current_year, value=min_birth_year, help="Year of birth of the injured worker (must be within the last 80 years).")
-            gender = st.selectbox("Gender", allowed_gender_values, help="Gender of the injured worker.")
-            average_weekly_wage = st.number_input("Average Weekly Wage ($)", min_value=0.0, value=1000.0, help="Wage used to calculate benefits.")
+            age_at_injury = st.number_input("Age at Injury", min_value=10, max_value=80, value=30, help="Age of the injured worker at the time of injury.")
+            birth_year = st.number_input("Birth Year", min_value=min_birth_year, max_value=current_year, value=min_birth_year, help="Year of birth of the injured worker.")
+            gender = st.selectbox("Gender", ["Male", "Female"], help="Gender of the injured worker.")
+            average_weekly_wage = st.number_input("Average Weekly Wage", min_value=0.0, value=1000.0, help="Wage used to calculate benefits.")
 
         with col4:
-            attorney_representative = st.selectbox("Attorney/Representative", allowed_attorney_values, help="Whether the claim has an attorney or representative.")
-            alternative_dispute_resolution = st.selectbox("Alternative Dispute Resolution", allowed_adr_values, help="Whether external adjudication processes are used.")
+            attorney_representative = st.selectbox("Attorney/Representative", ["Yes", "No"], help="Whether the claim has an attorney or representative.")
+            alternative_dispute_resolution = st.selectbox("Alternative Dispute Resolution", ["Yes", "No"], help="Whether external adjudication processes are used.")
 
     # Group 3: Location & Industry Details
     with st.expander("Location & Industry"):
@@ -245,57 +236,64 @@ def input_page():
             medical_fee_regions = ["Upstate", "Downstate", "NYC"]
             medical_fee_region = st.selectbox("Medical Fee Region", medical_fee_regions, help="Region where the injured worker receives medical service.")
             industry_code = st.text_input("Industry Code", placeholder="e.g., 561320", help="NAICS code for the employer's industry.")
-            industry_code_description = st.selectbox("Industry Code Description", allowed_industry_values, help="2-digit NAICS description of the employer's industry.")
+            industry_code_description = st.text_input("Industry Code Description", placeholder="e.g., Construction", help="Industry description of the employer.")
 
     # Group 4: Injury Specifics
     with st.expander("Injury Specifics"):
         col7, col8 = st.columns(2)
         with col7:
-            covid_19_indicator = st.selectbox("COVID-19 Indicator", allowed_covid_values, help="Indicate if the claim may be associated with COVID-19.")
+            covid_19_indicator = st.selectbox("COVID-19 Indicator", ["Yes", "No"], help="Indicate if the claim may be associated with COVID-19.")
             ime4_count = st.number_input("IME-4 Count", min_value=0, value=0, help="Number of IME-4 forms received (Independent Examiner's Report).")
-            oiics_nature_of_injury_description = st.selectbox("OIICS Nature of Injury Description", allowed_oiics_values, help="OIICS code describing the nature of injury.")
+            wcio_nature_of_injury_description = st.text_input("WCIO Nature of Injury Description", placeholder="e.g., Fracture", help="Description of the nature of injury.")
 
         with col8:
             wcio_cause_of_injury_code = st.text_input("WCIO Cause of Injury Code", placeholder="e.g., 03", help="WCIO code representing the cause of injury.")
-            wcio_cause_of_injury_description = st.selectbox("WCIO Cause of Injury Description", allowed_wcio_cause_values, help="Description of the cause of injury.")
-            wcio_nature_of_injury_code = st.text_input("WCIO Nature of Injury Code", placeholder="e.g., 30", help="WCIO code representing the nature of injury.")
-            wcio_nature_of_injury_description = st.selectbox("WCIO Nature of Injury Description", allowed_wcio_nature_values, help="Description of the nature of injury.")
+            wcio_cause_of_injury_description = st.text_input("WCIO Cause of Injury Description", placeholder="e.g., Fall", help="Description of the cause of injury.")
             wcio_part_of_body_code = st.text_input("WCIO Part Of Body Code", placeholder="e.g., 15", help="WCIO code for affected part of body.")
-            wcio_part_of_body_description = st.selectbox("WCIO Part Of Body Description", allowed_wcio_body_values, help="Description of the affected body part.")
+            wcio_part_of_body_description = st.text_input("WCIO Part Of Body Description", placeholder="e.g., Head", help="Description of the affected body part.")
 
     # Group 5: Carrier & Claim Details
     with st.expander("Carrier & Claim"):
-        carrier_name = st.selectbox("Carrier Name", allowed_carrier_values, help="Primary insurance provider responsible for coverage from allowed values.")
+        carrier_name = st.text_input("Carrier Name", placeholder="e.g., ABC Insurance", help="Primary insurance provider responsible for coverage.")
+        carrier_type = st.selectbox("Carrier Type", ["Insurance Company", "Self-Insured Employer", "Group Self-Insurer", "State Insurance Fund"], help="Type of insurance provider.")
+
+    # Group 6: Additional Details
+    with st.expander("Additional Claim Details"):
+        agreement_reached = st.selectbox("Agreement Reached", ["Yes", "No"], help="Indicates if an agreement was reached without WCB involvement.")
+        wcb_decision = st.selectbox("WCB Decision", ["Accident", "Occupational Disease", "Pending"], help="Decision category relative to the claim by WCB.")
+        number_of_dependents = st.number_input("Number of Dependents", min_value=0, value=0, help="Number of dependents claimed in the case.")
 
     # Collect all inputs into a dictionary
     inputs = {
-        'accident_date': accident_date,
-        'age_at_injury': age_at_injury,
-        'alternative_dispute_resolution': alternative_dispute_resolution,
-        'assembly_date': assembly_date,
-        'attorney_representative': attorney_representative,
-        'average_weekly_wage': average_weekly_wage,
-        'birth_year': birth_year,
-        'c2_date': c2_date,
-        'c3_date': c3_date,
-        'carrier_name': carrier_name,
-        'county_of_injury': county_of_injury,
-        'covid_19_indicator': covid_19_indicator,
-        'district_name': district_name,
-        'first_hearing_date': first_hearing_date,
-        'gender': gender,
-        'ime4_count': ime4_count,
-        'industry_code': industry_code,
-        'industry_code_description': industry_code_description,
-        'medical_fee_region': medical_fee_region,
-        'oiics_nature_of_injury_description': oiics_nature_of_injury_description,
-        'wcio_cause_of_injury_code': wcio_cause_of_injury_code,
-        'wcio_cause_of_injury_description': wcio_cause_of_injury_description,
-        'wcio_nature_of_injury_code': wcio_nature_of_injury_code,
-        'wcio_nature_of_injury_description': wcio_nature_of_injury_description,
-        'wcio_part_of_body_code': wcio_part_of_body_code,
-        'wcio_part_of_body_description': wcio_part_of_body_description,
-        'zip_code': zip_code,
+        'Accident Date': accident_date,
+        'Age at Injury': age_at_injury,
+        'Alternative Dispute Resolution': alternative_dispute_resolution,
+        'Assembly Date': assembly_date,
+        'Attorney/Representative': attorney_representative,
+        'Average Weekly Wage': average_weekly_wage,
+        'Birth Year': birth_year,
+        'C-2 Date': c2_date,
+        'C-3 Date': c3_date,
+        'Carrier Name': carrier_name,
+        'Carrier Type': carrier_type,
+        'County of Injury': county_of_injury,
+        'COVID-19 Indicator': covid_19_indicator,
+        'District Name': district_name,
+        'First Hearing Date': first_hearing_date,
+        'Gender': gender,
+        'IME-4 Count': ime4_count,
+        'Industry Code': industry_code,
+        'Industry Code Description': industry_code_description,
+        'Medical Fee Region': medical_fee_region,
+        'WCIO Cause of Injury Code': wcio_cause_of_injury_code,
+        'WCIO Cause of Injury Description': wcio_cause_of_injury_description,
+        'WCIO Nature of Injury Description': wcio_nature_of_injury_description,
+        'WCIO Part Of Body Code': wcio_part_of_body_code,
+        'WCIO Part Of Body Description': wcio_part_of_body_description,
+        'Zip Code': zip_code,
+        'Agreement Reached': agreement_reached,
+        'WCB Decision': wcb_decision,
+        'Number of Dependents': number_of_dependents,
     }
 
     st.markdown("**Please review all the information carefully before submitting.**")
@@ -303,3 +301,4 @@ def input_page():
         st.session_state.inputs = inputs
         st.session_state.page = "output"
         st.success("Your data has been submitted! You will be redirected to the output page.")
+
