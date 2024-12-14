@@ -219,7 +219,49 @@ def categorize_ime4_count(count):
 
 
 def output_page():
-  
+    # Extract the contents of the zip file
+    zip_file = "train_data.zip"  # Ensure the zip file is in the same directory
+    csv_file = "train_data.csv"
+    try:
+        z = zipfile.ZipFile(zip_file)
+        z.extractall()
+        del z
+        st.success(f"Successfully extracted '{zip_file}'.")
+    except FileNotFoundError:
+        st.error(f"Zip file '{zip_file}' not found. Ensure it is in the correct directory.")
+        return
+    except Exception as e:
+        st.error(f"An error occurred while extracting '{zip_file}': {e}")
+        return
+
+    # Load the dataset
+    try:
+        train_data = pd.read_csv(csv_file)
+        st.success("Dataset loaded successfully.")
+        st.write(f"Number of rows: {train_data.shape[0]}, Number of columns: {train_data.shape[1]}")
+        st.write("Sample Data:")
+        st.dataframe(train_data.head())  # Use Streamlit's dataframe widget for a cleaner display
+    except FileNotFoundError:
+        st.error(f"CSV file '{csv_file}' not found after extraction. Please verify the zip contents.")
+        return
+    except Exception as e:
+        st.error(f"An error occurred while loading the dataset: {e}")
+        return
+      
+    # Set Claim Identifier as the index for both datasets
+    train_data.set_index('Claim Identifier', inplace=True)
+    train_to_split = train_data.copy()
+
+    columns_of_interest = train_to_split.columns[train_to_split.isnull().sum() == 19445]
+    # Drop rows where all columns in columns_of_interest have NaN values
+    train_to_split = train_to_split.dropna(subset=columns_of_interest, how='all')
+    train_to_split = train_to_split.drop(columns = 'OIICS Nature of Injury Description')
+
+    X = train_to_split.drop(columns= ['Agreement Reached','WCB Decision', 'Claim Injury Type')
+
+
+
+    
     # Load the model from a .joblib file
     model_path = 'logistic_model.joblib'
     try:
