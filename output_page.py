@@ -1,3 +1,5 @@
+pip install streamlit joblib pandas numpy scikit-learn matplotlib seaborn imbalanced-learn
+
 
 #Importing the libraries
 import streamlit as st
@@ -34,11 +36,8 @@ from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import GridSearchCV
 from sklearn.naive_bayes import GaussianNB
 
-
 import warnings
 from imblearn.over_sampling import SMOTE
-
-
 
 # Define your mapping dictionaries outside the function
 industry_code_description_mapping = {
