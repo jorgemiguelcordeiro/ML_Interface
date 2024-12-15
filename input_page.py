@@ -164,8 +164,6 @@ oiics_nature_of_injury_description_mapping = {
     "Burns": ["Burns"]
 }
 
-import streamlit as st
-import datetime
 
 # Function to get allowed values from mappings
 def get_allowed_values(mapping_dict):
