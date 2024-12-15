@@ -286,8 +286,8 @@ def input_page():
         'WCIO Part Of Body Code': wcio_part_of_body_code,
         'WCIO Part Of Body Description': wcio_part_of_body_description,
         'Zip Code': zip_code,
-        'Agreement Reached': agreement_reached,
-        'WCB Decision': wcb_decision,
+        #'Agreement Reached': agreement_reached,
+        #'WCB Decision': wcb_decision,
         'Number of Dependents': number_of_dependents,
     }
 
