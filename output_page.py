@@ -824,8 +824,71 @@ def output_page():
         return df
     train_feature_selection_group = apply_groupings(train_feature_selection_prep)
 
-        
-        
+    columns_to_scale = ['Age at Injury', 'Number of Dependents']
+
+    columns_already_encoded = [
+        'Alternative Dispute Resolution',
+        'Attorney/Representative',
+        'Gender',
+        'Assembly Date before Accident Date',
+        'C-2 or C-3 Date before Accident Date',
+        'C-2 or C-3 Date after Assembly Date',
+        'COVID Period']
+    
+    ordinal_columns = ['delay_days_category', 'IME-4 Count Category', 'Wage Category', 'missing_info_category']
+    
+    one_hot_columns = [
+        'Medical Fee Region', 'Missing_Dates', 'Mapped Industry Code Description', 'Mapped WCIO Nature of Injury Description',
+        'Mapped WCIO Cause of Injury Description', 'Mapped WCIO Part Of Body Description','Mapped Carrier Type']
+	
+		def encoder_and_scaler(scaler, fit_data, df, ordinal_columns, one_hot_columns, numerical_columns):
+   
+		    scalers = {"standard": StandardScaler(), "minmax": MinMaxScaler()}
+		    scaler = scalers[scaler]
+		    
+		    # Encoders and scalers must be fitted on the train data
+		    ordinal_encoder = OrdinalEncoder()
+		    one_hot_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False)  # Use sparse_output=False
+		    
+		    # Fit encoders on the fit_data
+		    if ordinal_columns:
+		        ordinal_encoder.fit(fit_data[ordinal_columns])
+		    if one_hot_columns:
+		        one_hot_encoder.fit(fit_data[one_hot_columns])
+		    if numerical_columns:
+		        scaler.fit(fit_data[numerical_columns])
+		    
+		    # Apply transformations
+		    ordinal_encoded = ordinal_encoder.transform(df[ordinal_columns]) if ordinal_columns else None
+		    one_hot_encoded = one_hot_encoder.transform(df[one_hot_columns]) if one_hot_columns else None
+		    scaled_numerical = scaler.transform(df[numerical_columns]) if numerical_columns else None
+		    
+		    # Generate new column names
+		    one_hot_columns_names = (
+		        one_hot_encoder.get_feature_names_out(one_hot_columns) if one_hot_columns else []
+		    )
+		    
+		    # Combine transformed data into a DataFrame
+		    transformed_dfs = []
+		    if ordinal_encoded is not None:
+		        transformed_dfs.append(pd.DataFrame(ordinal_encoded, columns=ordinal_columns, index=df.index))
+		    if one_hot_encoded is not None:
+		        transformed_dfs.append(pd.DataFrame(one_hot_encoded, columns=one_hot_columns_names, index=df.index))
+		    if scaled_numerical is not None:
+		        transformed_dfs.append(pd.DataFrame(scaled_numerical, columns=numerical_columns, index=df.index))
+		    
+		    # Include any columns not transformed
+		    other_columns = df.drop(columns=ordinal_columns + one_hot_columns + numerical_columns, errors='ignore')
+		    if not other_columns.empty:
+		        transformed_dfs.append(other_columns)
+		    
+		    # Concatenate all parts into a single DataFrame
+		    transformed_df = pd.concat(transformed_dfs, axis=1)
+		    
+		    return transformed_df
+			
+		train_feature_selection = encoder_and_scaler("standard", train_feature_selection_group, train_feature_selection_group, ordinal_columns, one_hot_columns, columns_to_scale)
+		        
 
     # Define the required columns based on your updated dataset
     required_columns = [
