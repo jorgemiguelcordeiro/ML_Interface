@@ -6,7 +6,7 @@ st.set_page_config(page_title="Claim Injury Type Prediction App", layout="wide")
 # Import page functions
 from welcome_page import welcome_page
 from input_page import input_page
-from output_page import output_page
+#from output_page import output_page
 from toggle_theme import toggle_theme
 
     
@@ -22,8 +22,8 @@ if st.session_state.page == 'welcome':
     welcome_page()
 elif st.session_state.page == 'input':
     input_page()
-elif st.session_state.page == 'output':
-    output_page()
+'''elif st.session_state.page == 'output':
+    output_page()'''
 
 
 
