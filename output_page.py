@@ -824,7 +824,7 @@ def output_page():
       
       return df
 
-    train_feature_selection_group = apply_groupings(train_feature_selection_prep)
+   # train_feature_selection_group = apply_groupings(train_feature_selection_prep)
 
 
     # Define the required columns based on your updated dataset
