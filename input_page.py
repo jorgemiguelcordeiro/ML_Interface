@@ -222,6 +222,8 @@ def input_page():
             birth_year = st.number_input("Birth Year", min_value=min_birth_year, max_value=current_year, value=min_birth_year, help="Year of birth of the injured worker.")
             gender = st.selectbox("Gender", allowed_genders, help="Gender of the injured worker.")
             average_weekly_wage = st.number_input("Average Weekly Wage", min_value=0.0, value=1000.0, help="Wage used to calculate benefits.")
+            number_of_dependents = st.number_input("Number of Dependents", min_value=0, value=0, help="Number of dependents claimed in the case.")
+
         with col4:
             attorney_representative = st.selectbox("Attorney/Representative", allowed_attorneys, help="Whether the claim has an attorney or representative.")
             alternative_dispute_resolution = st.selectbox("Alternative Dispute Resolution", allowed_adr, help="Whether external adjudication processes are used.")
@@ -234,7 +236,7 @@ def input_page():
             district_name = st.selectbox("District Name", ["Albany", "Binghamton", "Brooklyn", "Buffalo", "Long Island", "Manhattan", "Queens", "Rochester", "Syracuse"], help="WCB district office overseeing the claim.")
             zip_code = st.text_input("Zip Code", placeholder="e.g., 10001", help="ZIP code of the injured worker’s home address.")
         with col6:
-            medical_fee_regions = ["Upstate", "Downstate", "NYC"]
+            medical_fee_regions = ["I", 'II','III','IV', 'UK']
             medical_fee_region = st.selectbox("Medical Fee Region", medical_fee_regions, help="Region where the injured worker receives medical service.")
             industry_code = st.text_input("Industry Code", placeholder="e.g., 561320", help="NAICS code for the employer's industry.")
             industry_code_description = st.selectbox("Industry Code Description", allowed_industry_descriptions, help="Industry description of the employer.")
@@ -255,11 +257,8 @@ def input_page():
         carrier_name = st.text_input("Carrier Name", placeholder="e.g., ABC Insurance", help="Primary insurance provider responsible for coverage.")
         carrier_type = st.selectbox("Carrier Type", allowed_carrier_types, help="Type of insurance provider.")
 
-    with st.expander("Additional Claim Details"):
-        agreement_reached = st.selectbox("Agreement Reached", ["Yes", "No"], help="Indicates if an agreement was reached without WCB involvement.")
-        wcb_decision = st.selectbox("WCB Decision", ["Accident", "Occupational Disease", "Pending"], help="Decision category relative to the claim by WCB.")
-        number_of_dependents = st.number_input("Number of Dependents", min_value=0, value=0, help="Number of dependents claimed in the case.")
-
+    
+       
     inputs = {
         'Accident Date': accident_date,
         'Age at Injury': age_at_injury,
