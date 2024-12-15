@@ -745,37 +745,6 @@ def output_page():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
     # Define the required columns based on your updated dataset
     required_columns = [
         'Gender', 'Alternative Dispute Resolution', 
