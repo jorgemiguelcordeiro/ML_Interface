@@ -174,9 +174,6 @@ def get_allowed_values(mapping_dict):
     allowed_values.sort()
     return allowed_values
 
-import streamlit as st
-import datetime
-
 def input_page():
     # Sidebar branding/instructions
     st.sidebar.image("New York Workers' Compensation Board (WCB).png", use_column_width=True)  # Replace with your logo
