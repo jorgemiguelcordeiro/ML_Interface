@@ -179,7 +179,7 @@ def output_page():
             'WCIO Cause of Injury Description', 'WCIO Nature of Injury Description', 
             'WCIO Part Of Body Description', 'Carrier Type']
     
-        def debug_step(name, df):
+	def debug_step(name, df):
             """Imprime informações úteis sobre o estado do dataframe."""
             #print(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
             debug_info[name] = {"shape": df.shape, "null_count": df.isnull().sum().sum()}
@@ -287,9 +287,6 @@ def output_page():
           	    
           	return df, imputers, scalers
           
-          	
-
-        
 	    
         def process_gender_and_alternative_dispute(df):
             if 'Gender' in df.columns:
