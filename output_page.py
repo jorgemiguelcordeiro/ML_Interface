@@ -226,61 +226,60 @@ def output_page():
             return df, bounds
             
         def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
-	    """
-	    Processes the missing values, imputes data, and saves fitted imputers/scalers for reuse.
-	    
-	    Args:
-	        df (DataFrame): Data to be processed.
-	        is_train (bool): Whether this is training data.
-	        cols_to_impute (dict): Dictionary specifying mode/knn columns.
-	        imputers (dict): Stores imputers for reuse.
-	        scalers (dict): Stores scalers for reuse.
-	        
-	    Returns:
-	        df (DataFrame): Processed dataframe.
-	        imputers (dict): Fitted imputers.
-	        scalers (dict): Fitted scalers.
-	    """
-	    if imputers is None:
-	        imputers = {'mode': {}, 'knn': {}}
-	    if scalers is None:
-	        scalers = {}
-	
-	    # Flatten mode columns
-	    mode_columns = cols_to_impute.get('mode', [])
-	    knn_columns = cols_to_impute.get('knn', [])
-	    
-	    # MODE Imputation
-	    for col in mode_columns:
-	        if is_train:
-	            if col not in imputers['mode']:
-	                imputers['mode'][col] = SimpleImputer(strategy='most_frequent')
-	            df[col] = imputers['mode'][col].fit_transform(df[[col]]).ravel()
-	        else:
-	            if col in imputers['mode']:
-	                df[col] = imputers['mode'][col].transform(df[[col]]).ravel()
-	
-	    # KNN Imputation
-	    for col in knn_columns:
-	        if is_train:
-	            scaler = StandardScaler()
-	            knn_imputer = KNNImputer(n_neighbors=5)
-	
-	            # Scale the column and fit imputer
-	            df_scaled = scaler.fit_transform(df[[col]])
-	            df[col] = knn_imputer.fit_transform(df_scaled).ravel()
-	
-	            # Save the fitted objects
-	            scalers[col] = scaler
-	            imputers['knn'][col] = knn_imputer
-	        else:
-	            if col in scalers and col in imputers['knn']:
-	                df_scaled = scalers[col].transform(df[[col]])
-	                df[col] = imputers['knn'][col].transform(df_scaled).ravel()
-	
-	    return df, imputers, scalers
+            """
+            Processes the missing values, imputes data, and saves fitted imputers/scalers for reuse.
+            
+            Args:
+                df (DataFrame): Data to be processed.
+                is_train (bool): Whether this is training data.
+                cols_to_impute (dict): Dictionary specifying mode/knn columns.
+                imputers (dict): Stores imputers for reuse.
+                scalers (dict): Stores scalers for reuse.
+                
+            Returns:
+                df (DataFrame): Processed dataframe.
+                imputers (dict): Fitted imputers.
+                scalers (dict): Fitted scalers.
+            """
+            if imputers is None:
+                imputers = {'mode': {}, 'knn': {}}
+            if scalers is None:
+                scalers = {}
+        
+            # Flatten mode columns
+            mode_columns = cols_to_impute.get('mode', [])
+            knn_columns = cols_to_impute.get('knn', [])
+        
+            # MODE Imputation
+            for col in mode_columns:
+                if is_train:
+                    if col not in imputers['mode']:
+                        imputers['mode'][col] = SimpleImputer(strategy='most_frequent')
+                    df[col] = imputers['mode'][col].fit_transform(df[[col]]).ravel()
+                else:
+                    if col in imputers['mode']:
+                        df[col] = imputers['mode'][col].transform(df[[col]]).ravel()
+        
+            # KNN Imputation
+            for col in knn_columns:
+                if is_train:
+                    scaler = StandardScaler()
+                    knn_imputer = KNNImputer(n_neighbors=5)
+        
+                    # Scale the column and fit imputer
+                    df_scaled = scaler.fit_transform(df[[col]])
+                    df[col] = knn_imputer.fit_transform(df_scaled).ravel()
+        
+                    # Save the fitted objects
+                    scalers[col] = scaler
+                    imputers['knn'][col] = knn_imputer
+                else:
+                    if col in scalers and col in imputers['knn']:
+                        df_scaled = scalers[col].transform(df[[col]])
+                        df[col] = imputers['knn'][col].transform(df_scaled).ravel()
+        
+            return df, imputers, scalers
 
-    
     
         def process_gender_and_alternative_dispute(df):
             if 'Gender' in df.columns:
