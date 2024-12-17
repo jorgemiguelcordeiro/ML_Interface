@@ -226,50 +226,69 @@ def output_page():
             return df, bounds
             
         def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
-        	    
-	    if imputers is None:
-		imputers = {'mode': {}, 'knn': {}}
-	    if scalers is None:
-		scalers = {}
-	
-	    # Flatten mode columns
-	    mode_columns = cols_to_impute.get('mode', [])
-	    knn_columns = cols_to_impute.get('knn', [])
-	
-	    # MODE Imputation
-	    for col in mode_columns:
-		if is_train:
-		    if col not in imputers['mode']:
-			imputers['mode'][col] = SimpleImputer(strategy='most_frequent')
-		    df[col] = imputers['mode'][col].fit_transform(df[[col]]).ravel()
-		else:
-		    if col in imputers['mode']:
-			df[col] = imputers['mode'][col].transform(df[[col]]).ravel()
-	
-	    # KNN Imputation
-	    for col in knn_columns:
-		if is_train:
-		    scaler = StandardScaler()
-		    knn_imputer = KNNImputer(n_neighbors=5)
-	
-		    # Ensure column is reshaped as a 2D array
-		    col_data = df[col].to_numpy().reshape(-1, 1)
-	
-		    # Scale the column and fit imputer
-		    df_scaled = scaler.fit_transform(col_data)
-		    df[col] = knn_imputer.fit_transform(df_scaled).ravel()
-	
-		    # Save the fitted objects
-		    scalers[col] = scaler
-		    imputers['knn'][col] = knn_imputer
-		else:
-		    if col in scalers and col in imputers['knn']:
-			col_data = df[col].to_numpy().reshape(-1, 1)
-			df_scaled = scalers[col].transform(col_data)
-			df[col] = imputers['knn'][col].transform(df_scaled).ravel()
-	
-	    return df, imputers, scalers
-	
+          	"""
+          	Processa os dados, realizando imputação no caso de treino e reutilizando objetos ajustados nos outros casos.
+          	
+          	Args:
+          	    df (DataFrame): O dataframe para imputar dados.
+          	    is_train (bool): Se estamos no conjunto de treino.
+          	    cols_to_impute (dict): Estrutura com as colunas a imputar.
+          	    imputers (dict): Dicionário para armazenar imputadores ajustados.
+          	    scalers (dict): Dicionário para armazenar escaladores ajustados.
+          	    
+          	Returns:
+          	    df (DataFrame): Dados processados.
+          	    imputers (dict): Objetos ajustados para imputação.
+          	    scalers (dict): Objetos ajustados para escalonamento.
+          	"""
+          	
+          	# Se os dicionários não existirem, inicialize-os
+          	if imputers is None:
+          	    imputers = {'mode': {}, 'knn': {}}
+          	if scalers is None:
+          	    scalers = {}
+          	
+          	# Processamento para colunas 'mode' - imputando com 'most_frequent'
+          	for col_group_list in cols_to_impute['mode']:
+          	    for col_group in col_group_list:
+          		if is_train:
+          		    if col_group not in imputers['mode']:
+          			imputers['mode'][col_group] = SimpleImputer(strategy='most_frequent')
+          		    df[col_group] = imputers['mode'][col_group].fit_transform(df[[col_group]]).ravel()
+          		else:
+          		    if col_group in imputers['mode']:
+          			df[col_group] = imputers['mode'][col_group].transform(df[[col_group]]).ravel()
+              
+          	# Processamento para colunas 'knn' com imputação usando KNN e escalonamento
+          	for col in cols_to_impute['knn']:
+          	    if is_train:
+          		# Ajustar o imputador e escalador apenas no treinamento
+          		scaler = StandardScaler()
+          		knn_imputer = KNNImputer(n_neighbors=5)
+              
+          		# Aplicar escalonamento nos dados
+          		df_scaled = scaler.fit_transform(df[[col]])
+          		
+          		# Aplicar imputação nos dados escalonados
+          		df[col] = knn_imputer.fit_transform(df_scaled).ravel()
+          		
+          		# Salvar os objetos ajustados para uso nos outros conjuntos de dados
+          		scalers[col] = scaler
+          		imputers['knn'][col] = knn_imputer
+          	    else:
+          		# Usar apenas os objetos ajustados no treinamento para transformação
+          		if col in scalers and col in imputers['knn']:
+          		    df_scaled = scalers[col].transform(df[[col]])
+          		    df[col] = imputers['knn'][col].transform(df_scaled).ravel()
+          		    # Reverter o escalonamento após imputação com inverse_transform
+          	    
+          	for col in cols_to_impute['knn']:
+          	    if col in scalers:
+          		df[col] = scalers[col].inverse_transform(df[[col]]).ravel()
+          	    
+          	return df, imputers, scalers
+          
+          	
 
         
 	    
