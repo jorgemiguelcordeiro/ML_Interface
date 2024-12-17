@@ -225,7 +225,9 @@ def output_page():
             #debug_step("winsorize_with_iqr", df)
             return df, bounds
             
-        def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
+
+
+	def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
 	    """
 	    Processes the missing values, imputes data, and saves fitted imputers/scalers for reuse.
 	    """
@@ -271,8 +273,8 @@ def output_page():
 	                df[col] = imputers['knn'][col].transform(df_scaled).ravel()
 	
 	    return df, imputers, scalers
-
-    
+	
+	    
         def process_gender_and_alternative_dispute(df):
             if 'Gender' in df.columns:
                 df['Gender'] = np.where(df['Gender'].isin(['U', 'X']), np.nan, df['Gender'])
