@@ -225,8 +225,6 @@ def output_page():
             #debug_step("winsorize_with_iqr", df)
             return df, bounds
             
-
-
         def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
         	    
         	    if imputers is None:
@@ -272,6 +270,8 @@ def output_page():
         	
         	    return df, imputers, scalers
         	
+
+        
 	    
         def process_gender_and_alternative_dispute(df):
             if 'Gender' in df.columns:
