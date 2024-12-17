@@ -180,7 +180,7 @@ def output_page():
             'WCIO Part Of Body Description', 'Carrier Type']
     
 	def debug_step(name, df):
-            """Imprime informações úteis sobre o estado do dataframe."""
+            
             #print(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
             debug_info[name] = {"shape": df.shape, "null_count": df.isnull().sum().sum()}
         
