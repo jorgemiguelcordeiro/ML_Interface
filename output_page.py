@@ -227,49 +227,49 @@ def output_page():
             
         def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
         	    
-        	    if imputers is None:
-        	        imputers = {'mode': {}, 'knn': {}}
-        	    if scalers is None:
-        	        scalers = {}
-        	
-        	    # Flatten mode columns
-        	    mode_columns = cols_to_impute.get('mode', [])
-        	    knn_columns = cols_to_impute.get('knn', [])
-        	
-        	    # MODE Imputation
-        	    for col in mode_columns:
-        	        if is_train:
-        	            if col not in imputers['mode']:
-        	                imputers['mode'][col] = SimpleImputer(strategy='most_frequent')
-        	            df[col] = imputers['mode'][col].fit_transform(df[[col]]).ravel()
-        	        else:
-        	            if col in imputers['mode']:
-        	                df[col] = imputers['mode'][col].transform(df[[col]]).ravel()
-        	
-        	    # KNN Imputation
-        	    for col in knn_columns:
-        	        if is_train:
-        	            scaler = StandardScaler()
-        	            knn_imputer = KNNImputer(n_neighbors=5)
-        	
-        	            # Ensure column is reshaped as a 2D array
-        	            col_data = df[col].to_numpy().reshape(-1, 1)
-        	
-        	            # Scale the column and fit imputer
-        	            df_scaled = scaler.fit_transform(col_data)
-        	            df[col] = knn_imputer.fit_transform(df_scaled).ravel()
-        	
-        	            # Save the fitted objects
-        	            scalers[col] = scaler
-        	            imputers['knn'][col] = knn_imputer
-        	        else:
-        	            if col in scalers and col in imputers['knn']:
-        	                col_data = df[col].to_numpy().reshape(-1, 1)
-        	                df_scaled = scalers[col].transform(col_data)
-        	                df[col] = imputers['knn'][col].transform(df_scaled).ravel()
-        	
-        	    return df, imputers, scalers
-        	
+	    if imputers is None:
+		imputers = {'mode': {}, 'knn': {}}
+	    if scalers is None:
+		scalers = {}
+	
+	    # Flatten mode columns
+	    mode_columns = cols_to_impute.get('mode', [])
+	    knn_columns = cols_to_impute.get('knn', [])
+	
+	    # MODE Imputation
+	    for col in mode_columns:
+		if is_train:
+		    if col not in imputers['mode']:
+			imputers['mode'][col] = SimpleImputer(strategy='most_frequent')
+		    df[col] = imputers['mode'][col].fit_transform(df[[col]]).ravel()
+		else:
+		    if col in imputers['mode']:
+			df[col] = imputers['mode'][col].transform(df[[col]]).ravel()
+	
+	    # KNN Imputation
+	    for col in knn_columns:
+		if is_train:
+		    scaler = StandardScaler()
+		    knn_imputer = KNNImputer(n_neighbors=5)
+	
+		    # Ensure column is reshaped as a 2D array
+		    col_data = df[col].to_numpy().reshape(-1, 1)
+	
+		    # Scale the column and fit imputer
+		    df_scaled = scaler.fit_transform(col_data)
+		    df[col] = knn_imputer.fit_transform(df_scaled).ravel()
+	
+		    # Save the fitted objects
+		    scalers[col] = scaler
+		    imputers['knn'][col] = knn_imputer
+		else:
+		    if col in scalers and col in imputers['knn']:
+			col_data = df[col].to_numpy().reshape(-1, 1)
+			df_scaled = scalers[col].transform(col_data)
+			df[col] = imputers['knn'][col].transform(df_scaled).ravel()
+	
+	    return df, imputers, scalers
+	
 
         
 	    
