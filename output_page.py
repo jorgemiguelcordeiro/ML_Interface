@@ -228,9 +228,7 @@ def output_page():
 
 
 	def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
-	    """
-	    Processes the missing values, imputes data, and saves fitted imputers/scalers for reuse.
-	    """
+	    
 	    if imputers is None:
 	        imputers = {'mode': {}, 'knn': {}}
 	    if scalers is None:
