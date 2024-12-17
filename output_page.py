@@ -226,21 +226,7 @@ def output_page():
             return df, bounds
             
         def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
-            """
-            Processes the missing values, imputes data, and saves fitted imputers/scalers for reuse.
             
-            Args:
-                df (DataFrame): Data to be processed.
-                is_train (bool): Whether this is training data.
-                cols_to_impute (dict): Dictionary specifying mode/knn columns.
-                imputers (dict): Stores imputers for reuse.
-                scalers (dict): Stores scalers for reuse.
-                
-            Returns:
-                df (DataFrame): Processed dataframe.
-                imputers (dict): Fitted imputers.
-                scalers (dict): Fitted scalers.
-            """
             if imputers is None:
                 imputers = {'mode': {}, 'knn': {}}
             if scalers is None:
