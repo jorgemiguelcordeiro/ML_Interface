@@ -7,7 +7,7 @@ st.set_page_config(page_title="Claim Injury Type Prediction App", layout="wide")
 from welcome_page import welcome_page
 from input_page import input_page
 from output_page import output_page
-from toggle_theme import toggle_theme
+
 
     
 # Include theme toggle
