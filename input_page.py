@@ -39,7 +39,7 @@ from imblearn.over_sampling import SMOTE
 
 
 
-def output_page():
+def input_page():
         #this codes are from NAICS - https://www.bls.gov/iag/tgs/iag_index_naics.htm
     
     industry_mapping = {
@@ -916,12 +916,18 @@ def output_page():
             numerical_columns=columns_to_scale,
             outlier_treatment=True
         )
+    # Predict using the trained model
+    prediction = model.predict(preprocessed_data)
+
+    # Display the prediction result
+    st.subheader("Prediction Result")
+    st.write(f"The predicted outcome for the claim is: {prediction[0]}")
     
-    st.markdown("**Please review all the information carefully before submitting.**")
-    if st.button("Submit"):
-        st.session_state.inputs = inputs
-        st.session_state.page = "output"
-        st.success("Your data has been submitted! You will be redirected to the output page.")
+    #st.markdown("**Please review all the information carefully before submitting.**")
+    #if st.button("Submit"):
+        #st.session_state.inputs = inputs
+        #st.session_state.page = "output"
+        #st.success("Your data has been submitted! You will be redirected to the output page.")
 
 
 
