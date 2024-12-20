@@ -800,7 +800,7 @@ def output_page():
         st.error(f"An error occurred while loading the dataset: {e}")
         return
     train_data.set_index('Claim Identifier', inplace=True)
-    columns_of_interest = train_data.columns[train_to_split.isnull().sum() == 19445]
+    columns_of_interest = train_data.columns[train_data.isnull().sum() == 19445]
     # Drop rows where all columns in columns_of_interest have NaN values
     train_to_split = train_data.dropna(subset=columns_of_interest, how='all')
     train_to_split = train_to_split.drop(columns = 'OIICS Nature of Injury Description')
