@@ -917,21 +917,7 @@ def input_page():
             except Exception as e:
                 st.error(f"Error creating input DataFrame: {e}")
                 return
-            # Check if features match
-            try:
-                st.write("Validating features...")
-                expected_features = (
-                    model.get_booster().feature_names if hasattr(model, "get_booster") else model.feature_names_in_
-                )
-                if not all(feature in preprocessed_data.columns for feature in expected_features):
-                    st.error(f"Feature mismatch! Expected: {expected_features}, Got: {preprocessed_data.columns}")
-                    return
-                st.write("Feature validation successful.")
-            except Exception as e:
-                st.error(f"Error during feature validation: {e}")
-                return
-    
-            # Preprocess the input data
+           # Preprocess the input data
             try:
                 st.write("Starting preprocessing...")
                 preprocessed_data = preprocess_input(
@@ -947,7 +933,21 @@ def input_page():
             except Exception as e:
                 st.error(f"Error during preprocessing: {e}")
                 return
-    
+            
+            # Check if features match
+            try:
+                st.write("Validating features...")
+                expected_features = (
+                    model.get_booster().feature_names if hasattr(model, "get_booster") else model.feature_names_in_
+                )
+                if not all(feature in preprocessed_data.columns for feature in expected_features):
+                    st.error(f"Feature mismatch! Expected: {expected_features}, Got: {preprocessed_data.columns}")
+                    return
+                st.write("Feature validation successful.")
+            except Exception as e:
+                st.error(f"Error during feature validation: {e}")
+                return
+
             
     
             # Predict using the trained model
