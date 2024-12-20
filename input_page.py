@@ -1,296 +1,922 @@
+#Importing the libraries
 import streamlit as st
-import datetime
+import joblib
+import zipfile, io
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer, KNNImputer
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.impute import SimpleImputer
+from sklearn.model_selection import cross_validate
+from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
+                             f1_score)
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import time
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier, VotingClassifier, GradientBoostingClassifier, StackingClassifier
+from sklearn.svm import SVC  
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import VotingClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.linear_model import LassoCV
+from sklearn.feature_selection import mutual_info_classif
+from sklearn.feature_selection import SelectFromModel
+from sklearn.model_selection import GridSearchCV
+from sklearn.naive_bayes import GaussianNB
 
-# Existing dictionary mappings (provided by you)
-industry_code_description_mapping = {
-    "Service-Providing Industries": [
-        'ARTS, ENTERTAINMENT, AND RECREATION', 'ACCOMMODATION AND FOOD SERVICES', 'INFORMATION', 
-        'OTHER SERVICES (EXCEPT PUBLIC ADMINISTRATION)'
-    ],
-    "Trade, Transportation, and Utilities": [
-        'WHOLESALE TRADE', 'RETAIL TRADE', 'TRANSPORTATION AND WAREHOUSING', 'UTILITIES'
-    ],
-    "Public Service": [
-        'PUBLIC ADMINISTRATION', 'HEALTH CARE AND SOCIAL ASSISTANCE', 'EDUCATIONAL SERVICES'
-    ],
-    "Financial & Business Activities": [
-        'FINANCE AND INSURANCE', 'REAL ESTATE AND RENTAL AND LEASING', 'MANAGEMENT OF COMPANIES AND ENTERPRISES',
-        'ADMINISTRATIVE AND SUPPORT AND WASTE MANAGEMENT AND REMEDIAT', 'PROFESSIONAL, SCIENTIFIC, AND TECHNICAL SERVICES'
-    ],
-    "Goods-Producing Industries": [
-        'AGRICULTURE, FORESTRY, FISHING AND HUNTING','MINING','CONSTRUCTION','MANUFACTURING','','','',''
-    ]
-}
 
-wcio_nature_of_injury_description_mapping = {
-    "I. Specific Injury": [
-        'NO PHYSICAL INJURY', 'AMPUTATION', 'ANGINA PECTORIS','BURN','CONCUSSION','CONTUSION',
-        'CRUSHING','DISLOCATION','ELECTRIC SHOCK','ENUCLEATION','FOREIGN BODY','FRACTURE',
-        'FREEZING','HEARING LOSS OR IMPAIRMENT','HEAT PROSTRATION','HERNIA','INFECTION',
-        'INFLAMMATION','ADVERSE REACTION TO A VACCINATION OR INOCULATION','LACERATION',
-        'MYOCARDIAL INFARCTION','POISONING - GENERAL (NOT OD OR CUMULATIVE','PUNCTURE','RUPTURE',
-        'SEVERANCE','SPRAIN OR TEAR','STRAIN OR TEAR','SYNCOPE','ASPHYXIATION','VASCULAR',
-        'VISION LOSS','ALL OTHER SPECIFIC INJURIES, NOC'
-    ],
-    "II. Occupational Disease or Cumulative Injury": [
-        'DUST DISEASE, NOC', 'ASBESTOSIS','BLACK LUNG','BYSSINOSIS',
-        'SILICOSIS','RESPIRATORY DISORDERS','POISONING - CHEMICAL, (OTHER THAN METALS)',
-        'POISONING - METAL','DERMATITIS','MENTAL DISORDER','RADIATION',
-        'ALL OTHER OCCUPATIONAL DISEASE INJURY, NOC','LOSS OF HEARING','CONTAGIOUS DISEASE',
-        'CANCER','AIDS','VDT - RELATED DISEASES','MENTAL STRESS','CARPAL TUNNEL SYNDROME',
-        'HEPATITIS C','ALL OTHER CUMULATIVE INJURY, NOC','COVID-19'
-    ],
-    "III. Multiple Injuries": [
-        'MULTIPLE PHYSICAL INJURIES ONLY', 'MULTIPLE INJURIES INCLUDING BOTH PHYSICAL AND PSYCHOLOGICAL'
-    ]
-}
+import warnings
+from imblearn.over_sampling import SMOTE
 
-wcio_cause_of_injury_description_mapping = {
-    "I. Burn or Scald – Heat or Cold": [
-        'CHEMICALS','HOT OBJECTS OR SUBSTANCES','TEMPERATURE EXTREMES','FIRE OR FLAME',
-        'STEAM OR HOT FLUIDS','DUST, GASES, FUMES OR VAPORS','WELDING OPERATION',
-        'RADIATION','CONTACT WITH, NOC','COLD OBJECTS OR SUBSTANCES','ABNORMAL AIR PRESSURE',
-        'ELECTRICAL CURRENT'
-    ],
-    "II. Caught In, Under or Between": [
-        'MACHINE OR MACHINERY','OBJECT HANDLED','CAUGHT IN, UNDER OR BETWEEN, NOC',
-        'COLLAPSING MATERIALS (SLIDES OF EARTH)'
-    ],
-    "III. Cut, Puncture, Scrape Injured By": [
-        'BROKEN GLASS','HAND TOOL, UTENSIL; NOT POWERED','OBJECT BEING LIFTED OR HANDLED',
-        'POWERED HAND TOOL, APPLIANCE','CUT, PUNCTURE, SCRAPE, NOC'
-    ],
-    "IV. Fall, Slip or Trip Injury": [
-        'FROM DIFFERENT LEVEL (ELEVATION)','FROM LADDER OR SCAFFOLDING',
-        'FROM LIQUID OR GREASE SPILLS','INTO OPENINGS','ON SAME LEVEL','SLIP, OR TRIP, DID NOT FALL',
-        'FALL, SLIP OR TRIP, NOC','ON ICE OR SNOW','ON STAIRS'
-    ],
-    "V. Motor Vehicle": [
-        'CRASH OF WATER VEHICLE','CRASH OF RAIL VEHICLE','COLLISION WITH A FIXED OBJECT',
-        'COLLISION OR SIDESWIPE WITH ANOTHER VEHICLE','CRASH OF AIRPLANE','VEHICLE UPSET','MOTOR VEHICLE, NOC'
-    ],
-    "VI. Strain or Injury By": [
-        'CONTINUAL NOISE','TWISTING','JUMPING OR LEAPING','HOLDING OR CARRYING','LIFTING',
-        'PUSHING OR PULLING','REACHING','USING TOOL OR MACHINERY','STRAIN OR INJURY BY, NOC',
-        'WIELDING OR THROWING','REPETITIVE MOTION'
-    ],
-    "VII. Striking Against or Stepping On": [
-        'MOVING PART OF MACHINE','SANDING, SCRAPING, CLEANING OPERATION',
-        'STATIONARY OBJECT','STEPPING ON SHARP OBJECT','STRIKING AGAINST OR STEPPING ON, NOC'
-    ],
-    "VIII.Struck or Injured By": [
-        'FELLOW WORKER, PATIENT OR OTHER PERSON','FALLING OR FLYING OBJECT','HAND TOOL OR MACHINE IN USE',
-        'MOTOR VEHICLE','MOVING PARTS OF MACHINE','OBJECT HANDLED BY OTHERS','STRUCK OR INJURED, NOC',
-        'ANIMAL OR INSECT','EXPLOSION OR FLARE BACK'
-    ],
-    "IX. Rubbed or Abraded By": [
-        'RUBBED OR ABRADED, NOC'
-    ],
-    "X. Miscellaneous Causes": [
-        'ABSORPTION, INGESTION OR INHALATION, NOC','FOREIGN MATTER (BODY) IN EYE(S)','NATURAL DISASTERS',
-        'PERSON IN ACT OF A CRIME','OTHER THAN PHYSICAL CAUSE OF INJURY','MOLD','TERRORISM',
-        'CUMULATIVE, NOC','OTHER - MISCELLANEOUS, NOC','GUNSHOT','PANDEMIC'
-    ]
-}
 
-wcio_part_of_body_description_mapping = {
-    "OTHERS or Multiple Areas": [
-        'ARTIFICIAL APPLIANCE', 'BODY SYSTEMS AND MULTIPLE BODY SYSTEMS',
-        'INSUFFICIENT INFO TO PROPERLY IDENTIFY - UNCLASSIFIED','MULTIPLE','MULTIPLE BODY PARTS (INCLUDING BODY',
-        'NO PHYSICAL INJURY','WHOLE BODY', 'SOFT TISSUE'
-    ],
-    "I. Head": [
-        'MULTIPLE HEAD INJURY', 'SKULL','BRAIN','EAR(S)','EYE(S)','NOSE','TEETH','MOUTH','FACIAL BONES'
-    ],
-    "II. Neck": [
-        'MULTIPLE NECK INJURY','VERTEBRAE','DISC','SPINAL CORD','LARYNX','TRACHEA'
-    ],
-    "III. Upper Extremities": [
-        'MULTIPLE UPPER EXTREMITIES','UPPER ARM','ELBOW','LOWER ARM','WRIST','WRIST (S) & HAND(S)', 'SHOULDER(S)',
-        'HAND', 'THUMB', 'FINGER(S)'
-    ],
-    "IV. Trunk": [
-        'MULTIPLE TRUNK','UPPER BACK AREA','LOWER BACK AREA','CHEST','SACRUM AND COCCYX','PELVIS','INTERNAL ORGANS',
-        'HEART','LUNGS','ABDOMEN INCLUDING GROIN','BUTTOCKS','LUMBAR & OR SACRAL VERTEBRAE (VERTEBRA',
-        'LUMBAR & OR SACRAL VERTEBRAE (VERTEBRA NOC TRUNK)'
-    ],
-    "V. Lower Extremities": [
-        'MULTIPLE LOWER EXTREMITIES','HIP','UPPER LEG','KNEE','LOWER LEG','ANKLE','FOOT','TOES','GREAT TOE'
-    ]
-}
 
-carrier_type_mapping = {
-    "Private Carriers": [
-        "1A. PRIVATE", "4A. SELF PRIVATE"
-    ],
-    "Public Carriers": [
-        "3A. SELF PUBLIC", "2A. SIF"
-    ],
-    "Special Funds": [
-        "5A. SPECIAL FUND - CONS. COMM. (SECT. 25-A)", "5C. SPECIAL FUND - POI CARRIER WCB MENANDS",
-        "5D. SPECIAL FUND - UNKNOWN"
-    ],
-    "Unknown": [
-        "UNKNOWN"
-    ]
-}
-
-# Additional dictionary-based mappings for fields that previously had hard-coded values
-gender_mapping = {
-    "Male": ["Male"],
-    "Female": ["Female"]
-}
-
-adr_mapping = {
-    "Yes": ["Yes"],
-    "No": ["No"]
-}
-
-attorney_mapping = {
-    "Yes": ["Yes"],
-    "No": ["No"]
-}
-
-covid_mapping = {
-    "Yes": ["Yes"],
-    "No": ["No"]
-}
-
-# OIICS nature of injury description mapping (sample)
-oiics_nature_of_injury_description_mapping = {
-    "Fractures": ["Fractures"],
-    "Sprains": ["Sprains"],
-    "Cuts": ["Cuts"],
-    "Burns": ["Burns"]
-}
-
-# Function to get allowed values from mappings
-def get_allowed_values(mapping_dict):
-    allowed_values = []
-    for key, values in mapping_dict.items():
-        cleaned_values = [v for v in values if v.strip() != '']
-        allowed_values.extend(cleaned_values)
-    # Remove duplicates and sort
-    allowed_values = list(set(allowed_values))
-    allowed_values.sort()
-    return allowed_values
-
-# Generate allowed values for fields
-allowed_industry_descriptions = get_allowed_values(industry_code_description_mapping)
-allowed_injury_descriptions = get_allowed_values(wcio_nature_of_injury_description_mapping)
-allowed_injury_causes = get_allowed_values(wcio_cause_of_injury_description_mapping)
-allowed_body_parts = get_allowed_values(wcio_part_of_body_description_mapping)
-allowed_carrier_types = get_allowed_values(carrier_type_mapping)
-allowed_genders = get_allowed_values(gender_mapping)
-allowed_adr = get_allowed_values(adr_mapping)
-allowed_attorneys = get_allowed_values(attorney_mapping)
-allowed_covid = get_allowed_values(covid_mapping)
-
-def input_page():
-    st.sidebar.image("New York Workers' Compensation Board (WCB).png", use_column_width=True)
-    st.sidebar.write("**Instructions:**")
-    st.sidebar.write("1. Fill out all the necessary claim-related information.")
-    st.sidebar.write("2. Use the hints next to each field for clarification.")
-    st.sidebar.write("3. Click **Submit** at the bottom when done.")
-    st.sidebar.markdown("---")
-    st.sidebar.write("For support, contact: support@company.com")
-
-    st.markdown(
-        "<p style='color:red; font-weight:bold; font-size:16px;'>THIS FORM MAY ONLY BE SUBMITTED ELECTRONICALLY. DO NOT MAIL.</p>",
-        unsafe_allow_html=True
-    )
-    st.title("Input Claim Data")
-    st.write("Please provide the following information for the claim. Fields are organized for clarity. Hover over the info icons for additional details.")
-
-    with st.expander("Basic Claim Details"):
-        col1, col2 = st.columns(2)
-        with col1:
-            accident_date = st.date_input("Accident Date", value=datetime.date.today(), help="Date when the accident occurred.")
-            assembly_date = st.date_input("Assembly Date", value=datetime.date.today(), help="Date the claim was first assembled by the board.")
-        with col2:
-            c2_date = st.date_input("C-2 Date", value=datetime.date.today(), help="Date the Employer's Report of Work-Related Injury/Illness (C-2) was received.")
-            c3_date = st.date_input("C-3 Date", value=datetime.date.today(), help="Date Employee Claim Form (C-3) was received.")
-            first_hearing_date = st.date_input("First Hearing Date", value=datetime.date.today(), help="Date of the first hearing on the claim.")
-
-    current_year = datetime.date.today().year
-    min_birth_year = current_year - 80
-
-    with st.expander("Personal & Employment Details"):
-        col3, col4 = st.columns(2)
-        with col3:
-            age_at_injury = st.number_input("Age at Injury", min_value=10, max_value=80, value=30, help="Age of the injured worker at the time of injury.")
-            birth_year = st.number_input("Birth Year", min_value=min_birth_year, max_value=current_year, value=min_birth_year, help="Year of birth of the injured worker.")
-            gender = st.selectbox("Gender", allowed_genders, help="Gender of the injured worker.")
-            average_weekly_wage = st.number_input("Average Weekly Wage", min_value=0.0, value=1000.0, help="Wage used to calculate benefits.")
-            number_of_dependents = st.number_input("Number of Dependents", min_value=0, value=0, help="Number of dependents claimed in the case.")
-
-        with col4:
-            attorney_representative = st.selectbox("Attorney/Representative", allowed_attorneys, help="Whether the claim has an attorney or representative.")
-            alternative_dispute_resolution = st.selectbox("Alternative Dispute Resolution", allowed_adr, help="Whether external adjudication processes are used.")
-
-    with st.expander("Location & Industry"):
-        col5, col6 = st.columns(2)
-        with col5:
-            counties = ["Albany", "Bronx", "Brooklyn", "Queens", "Richmond", "Manhattan", "Suffolk", "Nassau", "Westchester"]
-            county_of_injury = st.selectbox("County of Injury", counties, help="New York county where the injury occurred.")
-            district_name = st.selectbox("District Name", ["Albany", "Binghamton", "Brooklyn", "Buffalo", "Long Island", "Manhattan", "Queens", "Rochester", "Syracuse"], help="WCB district office overseeing the claim.")
-            zip_code = st.text_input("Zip Code", placeholder="e.g., 10001", help="ZIP code of the injured worker’s home address.")
-        with col6:
-            medical_fee_regions = ["I", 'II','III','IV', 'UK']
-            medical_fee_region = st.selectbox("Medical Fee Region", medical_fee_regions, help="Region where the injured worker receives medical service.")
-            industry_code = st.text_input("Industry Code", placeholder="e.g., 561320", help="NAICS code for the employer's industry.")
-            industry_code_description = st.selectbox("Industry Code Description", allowed_industry_descriptions, help="Industry description of the employer.")
-
-    with st.expander("Injury Specifics"):
-        col7, col8 = st.columns(2)
-        with col7:
-            covid_19_indicator = st.selectbox("COVID-19 Indicator", allowed_covid, help="Indicate if the claim may be associated with COVID-19.")
-            ime4_count = st.number_input("IME-4 Count", min_value=0, value=0, help="Number of IME-4 forms received (Independent Examiner's Report).")
-            wcio_nature_of_injury_description = st.selectbox("WCIO Nature of Injury Description", allowed_injury_descriptions, help="Description of the nature of injury.")
-        with col8:
-            wcio_cause_of_injury_code = st.text_input("WCIO Cause of Injury Code", placeholder="e.g., 03", help="WCIO code representing the cause of injury.")
-            wcio_cause_of_injury_description = st.selectbox("WCIO Cause of Injury Description", allowed_injury_causes, help="Description of the cause of injury.")
-            wcio_part_of_body_code = st.text_input("WCIO Part Of Body Code", placeholder="e.g., 15", help="WCIO code for affected part of body.")
-            wcio_part_of_body_description = st.selectbox("WCIO Part Of Body Description", allowed_body_parts, help="Description of the affected body part.")
-
-    with st.expander("Carrier & Claim"):
-        carrier_name = st.text_input("Carrier Name", placeholder="e.g., ABC Insurance", help="Primary insurance provider responsible for coverage.")
-        carrier_type = st.selectbox("Carrier Type", allowed_carrier_types, help="Type of insurance provider.")
-
+def output_page():
+        #this codes are from NAICS - https://www.bls.gov/iag/tgs/iag_index_naics.htm
     
+    industry_mapping = {
+        'Industry_high_0': ['MANAGEMENT OF COMPANIES AND ENTERPRISES'],
+        'Industry_high_1': [
+            'HEALTH CARE AND SOCIAL ASSISTANCE', 'MANUFACTURING', 'FINANCE AND INSURANCE',
+            'REAL ESTATE AND RENTAL AND LEASING', 'OTHER SERVICES (EXCEPT PUBLIC ADMINISTRATION)',
+            'RETAIL TRADE', 'ACCOMMODATION AND FOOD SERVICES', 'MINING',
+            'PROFESSIONAL, SCIENTIFIC, AND TECHNICAL SERVICES', 'ARTS, ENTERTAINMENT, AND RECREATION'],
+        'Industry_high_2': ['EDUCATIONAL SERVICES'],
+        'Industry_high_3_mid_5': [
+            'CONSTRUCTION', 'ADMINISTRATIVE AND SUPPORT AND WASTE MANAGEMENT AND REMEDIAT',
+            'TRANSPORTATION AND WAREHOUSING', 'WHOLESALE TRADE'],
+        'Industry_high_4': ['UTILITIES', 'PUBLIC ADMINISTRATION'],
+        'Industry_high_5': ['INFORMATION'],
+        'Industry_high_3_2': ['AGRICULTURE, FORESTRY, FISHING AND HUNTING']}
+    
+    
+    
+    nature_of_injury_mapping = {
+        'Nature of Injury Cluster 10': ['BYSSINOSIS', 'BLACK LUNG', 'VDT - RELATED DISEASES'],
+        'Nature of Injury Cluster 4': ['ENUCLEATION', 'HERNIA', 'MENTAL DISORDER'],
+        'Nature of Injury Cluster 17': ['DISLOCATION'],
+        'Nature of Injury Cluster 15': ['FRACTURE', 'SEVERANCE', 'CRUSHING', 'CARPAL TUNNEL SYNDROME'],
+        'Nature of Injury Cluster 1': ['AMPUTATION'],
+        'Nature of Injury Cluster 9': ['RUPTURE'],
+        'Nature of Injury Cluster 6': ['SILICOSIS'],
+        'Nature of Injury Cluster 16': ['MULTIPLE INJURIES INCLUDING BOTH PHYSICAL AND PSYCHOLOGICAL', 'MENTAL STRESS',
+                                    'ALL OTHER SPECIFIC INJURIES, NOC', 'INFLAMMATION', 'ALL OTHER CUMULATIVE INJURY, NOC', 'CONTUSION'],
+        'Nature of Injury Cluster 12': ['SPRAIN OR TEAR', 'CONCUSSION', 'MULTIPLE PHYSICAL INJURIES ONLY', 'STRAIN OR TEAR', 'DUST DISEASE, NOC'],
+        'Nature of Injury Cluster 0': ['ASBESTOSIS'],
+        'Nature of Injury Cluster 2': ['COVID-19', 'VISION LOSS', 'FREEZING', 'BURN', 'AIDS', 'ELECTRIC SHOCK', 'INFECTION', 'LACERATION',
+                                   'POISONING - CHEMICAL, (OTHER THAN METALS)', 'RESPIRATORY DISORDERS', 'FOREIGN BODY', 'HEAT PROSTRATION',
+                                   'POISONING - GENERAL (NOT OD OR CUMULATIVE'],
+        'Nature of Injury Cluster 14': ['ASPHYXIATION'],
+        'Nature of Injury Cluster 8': ['VASCULAR'],
+        'Nature of Injury Cluster 5': ['ANGINA PECTORIS', 'POISONING - METAL', 'MYOCARDIAL INFARCTION',
+                                   'ADVERSE REACTION TO A VACCINATION OR INOCULATION', 'DERMATITIS', 'NO PHYSICAL INJURY',
+                                   'CONTAGIOUS DISEASE', 'SYNCOPE', 'PUNCTURE', 'RADIATION'],
+        'Nature of Injury Cluster 3': ['CANCER'],
+        'Nature of Injury Cluster 13': ['ALL OTHER OCCUPATIONAL DISEASE INJURY, NOC'],
+        'Nature of Injury Cluster 7': ['LOSS OF HEARING', 'HEARING LOSS OR IMPAIRMENT'],
+        'Nature of Injury Cluster 11': ['HEPATITIS C']}
+    
+    
+    #https://www.guarantysupport.com/wp-content/uploads/2024/02/WCIO-Legacy.pdf & https://www.mwcia.org/Media/Default/PDF/NewsFeed/Circulars/21-1787.pdf
+    
+    WCIO_Cause_map = {
+        'Cause of Injury Cluster 11': ['CRASH OF RAIL VEHICLE'],
+        'Cause of Injury Cluster 15': ['FROM LADDER OR SCAFFOLDING', 'MOTOR VEHICLE', 'VEHICLE UPSET',
+                                   'COLLISION OR SIDESWIPE WITH ANOTHER VEHICLE', 'MOTOR VEHICLE, NOC'],
+        'Cause of Injury Cluster 10': ['GUNSHOT'],
+        'Cause of Injury Cluster 0': ['COLLAPSING MATERIALS (SLIDES OF EARTH)', 'MOVING PARTS OF MACHINE',
+                                  'JUMPING OR LEAPING', 'MACHINE OR MACHINERY', 'SLIP, OR TRIP, DID NOT FALL',
+                                  'STRAIN OR INJURY BY, NOC', 'MOVING PART OF MACHINE', 'WIELDING OR THROWING'],
+        'Cause of Injury Cluster 14': ['INTO OPENINGS', 'LIFTING', 'ON STAIRS', 'CRASH OF AIRPLANE', 'HOLDING OR CARRYING',
+                                   'TWISTING', 'FALL, SLIP OR TRIP, NOC', 'FROM LIQUID OR GREASE SPILLS', 'ON SAME LEVEL',
+                                   'COLLISION WITH A FIXED OBJECT', 'ON ICE OR SNOW'],
+        'Cause of Injury Cluster 4': ['FROM DIFFERENT LEVEL (ELEVATION)', 'REACHING', 'USING TOOL OR MACHINERY'],
+        'Cause of Injury Cluster 8': ['EXPLOSION OR FLARE BACK', 'CRASH OF WATER VEHICLE', 'FIRE OR FLAME', 
+                                  'POWERED HAND TOOL, APPLIANCE', 'SANDING, SCRAPING, CLEANING OPERATION',
+                                  'FALLING OR FLYING OBJECT', 'CAUGHT IN, UNDER OR BETWEEN, NOC', 'HAND TOOL OR MACHINE IN USE',
+                                  'OBJECT HANDLED', 'STRIKING AGAINST OR STEPPING ON, NOC', 'FELLOW WORKER, PATIENT OR OTHER PERSON',
+                                  'OBJECT HANDLED BY OTHERS', 'ELECTRICAL CURRENT', 'STRUCK OR INJURED, NOC', 'STATIONARY OBJECT',
+                                  'STEAM OR HOT FLUIDS', 'WELDING OPERATION', 'OBJECT BEING LIFTED OR HANDLED'],
+        'Cause of Injury Cluster 12': ['PUSHING OR PULLING', 'PERSON IN ACT OF A CRIME'],
+        'Cause of Injury Cluster 6': ['REPETITIVE MOTION', 'CUMULATIVE, NOC'],
+        'Cause of Injury Cluster 13': ['PANDEMIC', 'OTHER - MISCELLANEOUS, NOC', 'OTHER THAN PHYSICAL CAUSE OF INJURY',
+                                   'ABSORPTION, INGESTION OR INHALATION, NOC'],
+        'Cause of Injury Cluster 3': ['BROKEN GLASS', 'HOT OBJECTS OR SUBSTANCES', 'TEMPERATURE EXTREMES', 'STEPPING ON SHARP OBJECT',
+                                  'CHEMICALS', 'COLD OBJECTS OR SUBSTANCES', 'RUBBED OR ABRADED, NOC', 'CONTACT WITH, NOC',
+                                  'ANIMAL OR INSECT', 'CUT, PUNCTURE, SCRAPE, NOC', 'HAND TOOL, UTENSIL; NOT POWERED',
+                                  'RADIATION', 'FOREIGN MATTER (BODY) IN EYE(S)', 'MOLD'],
+        'Cause of Injury Cluster 5': ['TERRORISM'],
+        'Cause of Injury Cluster 9': ['CONTINUAL NOISE'],
+        'Cause of Injury Cluster 7': ['DUST, GASES, FUMES OR VAPORS'],
+        'Cause of Injury Cluster 2': ['ABNORMAL AIR PRESSURE'],
+        'Cause of Injury Cluster 1': ['NATURAL DISASTERS']}
+    
+    part_of_body_mapping = {
+        'Part Of Body Cluster 3': ['WHOLE BODY', 'HEART'],
+        'Part Of Body Cluster 10': ['INTERNAL ORGANS'],
+        'Part Of Body Cluster 9': ['LUNGS', 'BODY SYSTEMS AND MULTIPLE BODY SYSTEMS', 'NO PHYSICAL INJURY'],
+        'Part Of Body Cluster 6': ['BRAIN', 'SPINAL CORD'],
+        'Part Of Body Cluster 7': ['INSUFFICIENT INFO TO PROPERLY IDENTIFY - UNCLASSIFIED', 'WRIST (S) & HAND(S)'],
+        'Part Of Body Cluster 4': ['CHEST', 'SKULL', 'BUTTOCKS', 'SOFT TISSUE', 'MULTIPLE HEAD INJURY',
+                               'ABDOMEN INCLUDING GROIN', 'LOWER LEG', 'LOWER ARM', 'HAND', 'FACIAL BONES',
+                               'FOOT', 'GREAT TOE', 'MULTIPLE LOWER EXTREMITIES', 'NOSE', 'SACRUM AND COCCYX', 'TOES', 'UPPER LEG'],
+        'Part Of Body Cluster 2': ['MULTIPLE BODY PARTS (INCLUDING BODY', 'MULTIPLE NECK INJURY', 'LOWER BACK AREA',
+                               'LUMBAR & OR SACRAL VERTEBRAE (VERTEBRA', 'UPPER BACK AREA', 'DISC', 'MULTIPLE TRUNK',
+                               'PELVIS', 'VERTEBRAE'],
+        'Part Of Body Cluster 1': ['MOUTH', 'EYE(S)', 'FINGER(S)', 'LARYNX', 'TEETH', 'THUMB'],
+        'Part Of Body Cluster 12': ['MULTIPLE', 'KNEE', 'ELBOW', 'ANKLE', 'SHOULDER(S)', 'MULTIPLE UPPER EXTREMITIES', 'WRIST'],
+        'Part Of Body Cluster 0': ['UPPER ARM', 'HIP'],
+        'Part Of Body Cluster 5': ['ARTIFICIAL APPLIANCE'],
+        'Part Of Body Cluster 8': ['EAR(S)'],
+        'Part Of Body Cluster 11': ['TRACHEA']}
+    
+    # Dictionary to map 'Carrier Type' 
+    
+    carrier_type_mapping = {
+        "Private Carriers": ["1A. PRIVATE", "4A. SELF PRIVATE"],
+        "Public Carriers": ["3A. SELF PUBLIC", "2A. SIF"],
+        "SF_0_3": ["5C. SPECIAL FUND - POI CARRIER WCB MENANDS"],
+        "SF_0_2": ["5A. SPECIAL FUND - CONS. COMM. (SECT. 25-A)"],
+        "SF_2_1": ["5D. SPECIAL FUND - UNKNOWN"],
+        "Unknown": ["UNKNOWN"]}
+    
+    columns_to_scale = ['Age at Injury']
+    
+    columns_already_encoded = [
+        'Alternative Dispute Resolution',
+        'Attorney/Representative',
+        'Gender',
+        'Assembly Date before Accident Date',
+        'Assembly Date or C-2 or C-3 Date before Accident Date',
+        'COVID Period']
+    
+    ordinal_columns = ['delay_days_category', 'IME-4 Count Category', 'Wage Category', 'missing_info_category','Number of Dependents']
+    
+    one_hot_columns = [
+        'Medical Fee Region', 'Missing_Dates', 'Mapped Industry Code Description', 'Mapped WCIO Nature of Injury Description',
+        'Mapped WCIO Cause of Injury Description', 'Mapped WCIO Part Of Body Description','Mapped Carrier Type']
+    
+    def preprocessing_pipeline(train, val=None, test=None, outlier_treatment=True):
+        debug_info = {}
+        # Geral configurations
+        covid_start = pd.Timestamp('2020-03-01')
+        covid_end = pd.Timestamp('2021-12-31')
+    
+        binary_columns = ['Attorney/Representative', 'COVID-19 Indicator']
+        columns_to_replace = ['Age at Injury', 'Average Weekly Wage', 'Birth Year']
+        description_columns = [
+        ('Industry Code', 'Industry Code Description'),
+        ('WCIO Cause of Injury Code', 'WCIO Cause of Injury Description'),
+        ('WCIO Nature of Injury Code', 'WCIO Nature of Injury Description'),
+        ('WCIO Part Of Body Code', 'WCIO Part Of Body Description')]
+    
+        variables_to_treat_outliers = ['Age at Injury']
+        iqr_threshold = 1.5
+    
+        cols_to_impute = {
+            'mode': [['Gender', 'Alternative Dispute Resolution', 'Industry Code Description', 'WCIO Nature of Injury Description', 
+                         'WCIO Cause of Injury Description', 'WCIO Part Of Body Description']],
+            'knn': ['Age at Injury']}
+        columns_to_remove = [
+            'First Hearing Date', 'C-3 Date', 'IME-4 Count', 'Average Weekly Wage', 'Birth Year', 
+            'COVID-19 Indicator', 'Accident Date', 'Assembly Date', 'C-2 Date', 
+            'Carrier Name', 'County of Injury', 'District Name', 'Zip Code', 'Industry Code',
+            'WCIO Cause of Injury Code',  
+            'WCIO Nature of Injury Code', 'WCIO Part Of Body Code', 'Industry Code Description', 
+            'WCIO Cause of Injury Description', 'WCIO Nature of Injury Description', 
+            'WCIO Part Of Body Description', 'Carrier Type']
+    
+        def debug_step(name, df):
+            """Imprime informações úteis sobre o estado do dataframe."""
+            #print(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
+            debug_info[name] = {"shape": df.shape, "null_count": df.isnull().sum().sum()}
+        
+        def convert_to_binary(df, columns):
+            for col in columns:
+                df[col] = (df[col] == 'Y').astype(int)
+            debug_step("convert_to_binary", df)
+            return df
+    
+        def convert_numeric_columns(df):
+            numeric_cols = df.select_dtypes(['int64', 'float64']).columns
+            df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric)
+            #debug_step("convert_numeric_columns", df)
+            return df
+    
+        def convert_categorical_and_dates(df):
+            for col in df.select_dtypes(['object', 'category']).columns:
+                if 'Date' in col:
+                    df[col] = pd.to_datetime(df[col], errors='coerce')
+                else:
+                    df[col] = df[col].astype('category')
+            return df
+            #debug_step("convert_categorical_and_dates", df)
+    
+        def add_covid_flag(df, covid_start, covid_end):
+            df['COVID Period'] = ((df['Accident Date'] >= covid_start) & 
+                                  (df['Accident Date'] <= covid_end)).astype(int)
+            #debug_step("add_covid_flag", df)
+            return df
+    
+        def winsorize_with_iqr(df, columns, iqr_threshold):
+            bounds = {}
+            for col in columns:
+                q1, q3 = df[col].quantile([0.25, 0.75])
+                iqr = q3 - q1
+                lower = q1 - iqr_threshold * iqr
+                upper = q3 + iqr_threshold * iqr
+                df[col] = df[col].clip(lower, upper)
+                bounds[col] = (lower, upper)
+                print(f"Bounds for {col}: Lower = {lower}, Upper = {upper}")
+            #debug_step("winsorize_with_iqr", df)
+            return df, bounds
+            
+        def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
+            if imputers is None:
+                imputers = {'mode': {}, 'knn': {}}
+            if scalers is None:
+                scalers = {}
+            
+            # imputing 'mode' with 'most_frequent'
+            for col_group_list in cols_to_impute['mode']:
+                for col_group in col_group_list:
+                    if is_train:
+                        if col_group not in imputers['mode']:
+                            imputers['mode'][col_group] = SimpleImputer(strategy='most_frequent')
+                        df[col_group] = imputers['mode'][col_group].fit_transform(df[[col_group]]).ravel()
+                    else:
+                        if col_group in imputers['mode']:
+                            df[col_group] = imputers['mode'][col_group].transform(df[[col_group]]).ravel()
+        
+            # KNN 
+            for col in cols_to_impute['knn']:
+                if is_train:
+                    # train data only
+                    scaler = StandardScaler()
+                    knn_imputer = KNNImputer(n_neighbors=5)
+                    df_scaled = scaler.fit_transform(df[[col]])
+                    df[col] = knn_imputer.fit_transform(df_scaled).ravel()
+                    scalers[col] = scaler
+                    imputers['knn'][col] = knn_imputer
+                else:
+                    # based on the train imputers and scalers
+                    if col in scalers and col in imputers['knn']:
+                        df_scaled = scalers[col].transform(df[[col]])
+                        df[col] = imputers['knn'][col].transform(df_scaled).ravel()
+                
+            for col in cols_to_impute['knn']:
+                if col in scalers:
+                    df[col] = scalers[col].inverse_transform(df[[col]]).ravel()
+                
+            return df, imputers, scalers
+    
+    
+        def process_gender_and_alternative_dispute(df):
+            if 'Gender' in df.columns:
+                df['Gender'] = np.where(df['Gender'].isin(['U', 'X']), np.nan, df['Gender'])
+            if 'Alternative Dispute Resolution' in df.columns:
+                df['Alternative Dispute Resolution'] = np.where(df['Alternative Dispute Resolution'] == 'U', 
+                                                                np.nan, 
+                                                                df['Alternative Dispute Resolution'])
+            return df
+            debug_step("process_gender_and_alternative_dispute", df)
        
-    inputs = {
-        'Accident Date': accident_date,
-        'Age at Injury': age_at_injury,
-        'Alternative Dispute Resolution': alternative_dispute_resolution,
-        'Assembly Date': assembly_date,
-        'Attorney/Representative': attorney_representative,
-        'Average Weekly Wage': average_weekly_wage,
-        'Birth Year': birth_year,
-        'C-2 Date': c2_date,
-        'C-3 Date': c3_date,
-        'Carrier Name': carrier_name,
-        'Carrier Type': carrier_type,
-        'County of Injury': county_of_injury,
-        'COVID-19 Indicator': covid_19_indicator,
-        'District Name': district_name,
-        'First Hearing Date': first_hearing_date,
-        'Gender': gender,
-        'IME-4 Count': ime4_count,
-        'Industry Code': industry_code,
-        'Industry Code Description': industry_code_description,
-        'Medical Fee Region': medical_fee_region,
-        'WCIO Cause of Injury Code': wcio_cause_of_injury_code,
-        'WCIO Cause of Injury Description': wcio_cause_of_injury_description,
-        'WCIO Nature of Injury Description': wcio_nature_of_injury_description,
-        'WCIO Part Of Body Code': wcio_part_of_body_code,
-        'WCIO Part Of Body Description': wcio_part_of_body_description,
-        'Zip Code': zip_code,
-        #'Agreement Reached': agreement_reached,
-        #'WCB Decision': wcb_decision,
-        'Number of Dependents': number_of_dependents,
-    }
+        #Columns categorization
+        
+        def categorize_delay_days(x):
+            if pd.isna(x) or x < 0:
+                return 'Invalid'
+            elif x <= 30:
+                return "Short delays (0-30 days)"
+            elif x <= 180:
+                return "Medium delays (31-180 days)"
+            elif x <= 365:
+                return "Long delays (181-365 days)"
+            else:
+                return "Very long delays (>365 days)"
+            debug_step("categorize_delay_days", df)
+    
+        def categorize_missing_info(df):
+            def categorize(x):
+                if x == 0:
+                    return "No missing information"
+                elif x <= 2:
+                    return "Low missing information"
+                elif x <= 4:
+                    return "Moderate missing information"
+                elif x <= 8:
+                    return "High missing information"
+                else:
+                    return "Very high missing information"
+            
+            df['missing_info_category'] = df.isna().sum(axis=1).apply(categorize)
+            debug_step("categorize_missing_info", df)
+            return df
+    
+        def categorize_wage(x):
+            if pd.isna(x) or x <= 0:
+                return 'Invalid'
+            elif x <= 702:
+                return 'Very Low Income'
+            elif x <= 1100:
+                return 'Low Income'
+            elif x <= 1600:
+                return 'Middle Income'
+            elif x <= 3000:
+                return 'Upper Middle Income (Q3 to Upper Fence)'
+            else:
+                return 'High Income (> Upper Fence)'
+            debug_step("categorize_wage", df)
+    
+        def categorize_ime4_count(count):
+            if pd.isna(count) or count < 0:
+                return 'Invalid'
+            elif count < 1:
+                return "Low IME-4 Count"
+            elif 1 <= count <= 2:
+                return "Low IME-4 Count"
+            elif 2 < count <= 4:
+                return "Medium IME-4 Count"
+            elif 4 < count <= 8.5:
+                return "High IME-4 Count"
+            else:
+                return "Very High IME-4 Count"
+            debug_step("categorize_ime4_count", df)
+    
+        def check_missing_dates(row):
+            missing_columns = [
+                col for col in ["Accident Date", "C-3 Date", "C-2 Date", "Assembly Date", "First Hearing Date"] 
+                if pd.isna(row[col])]
+            return ", ".join(missing_columns) if missing_columns else "OK"
+            debug_step("check_missing_dates", df)
+    
+        def validate_dates(df):
+            # Rule 1: Assembly Date before Accident Date
+            df["Assembly Date before Accident Date"] = df.apply(lambda row: 
+                1 if pd.notna(row["Accident Date"]) and pd.notna(row["Assembly Date"]) and row["Assembly Date"] < row["Accident Date"] 
+                else 0, axis=1)
+            
+            # Rule 2: C-2 or C-3 Date before Accident Date
+            df["C-2 or C-3 Date before Accident Date"] = df.apply(lambda row: 
+                1 if pd.notna(row["Accident Date"]) and any([
+                    pd.notna(row["C-2 Date"]) and row["C-2 Date"] < row["Accident Date"],
+                    pd.notna(row["C-3 Date"]) and row["C-3 Date"] < row["Accident Date"]
+                ]) 
+                else 0, axis=1)
+        
+            # Rule 3: C-2 or C-3 Date after Assembly Date
+            df["C-2 or C-3 Date after Assembly Date"] = df.apply(lambda row: 
+                1 if pd.notna(row["Assembly Date"]) and any([
+                    pd.notna(row["C-2 Date"]) and row["C-2 Date"] > row["Assembly Date"],
+                    pd.notna(row["C-3 Date"]) and row["C-3 Date"] > row["Assembly Date"]
+                ]) 
+                else 0, axis=1)
+            debug_step("validate_dates", df)
+            return df
+    
+        # Funções de mapeamento para diferentes descrições
+        def industry_map(description):
+            for category, descriptions in industry_mapping.items():
+                if description in descriptions:
+                    return category
+            return "Unmapped"
+        
+        def nature_of_injury_map(description):
+            for category, descriptions in nature_of_injury_mapping.items():
+                if description in descriptions:
+                    return category
+            return "Unmapped"
+        
+        def map_cause(description):
+            for category, descriptions in WCIO_Cause_map.items():
+                if description in descriptions:
+                    return category
+            return "Unmapped"
+        
+        def map_part_of_body(description):
+            for category, descriptions in part_of_body_mapping.items():
+                if description in descriptions:
+                    return category
+            return "Unmapped"
+        
+        def map_carrier_type(carrier):
+            for category, carriers in carrier_type_mapping.items():
+                if carrier in carriers:
+                    return category
+            return "Unmapped"
+        
+        def group_rare_categories(series, threshold=1000):
+            counts = series.value_counts()
+            rare_categories = counts[counts < threshold].index
+            #print(f"Rare categories for {series.name}: {rare_categories.tolist()}")
+            return series.replace(rare_categories, 'Other')
+        
+        def apply_mappings_and_grouping(train, val=None, test=None, mappings=None, thresholds=None):
+            """
+            Aplica mapeamentos e agrupamento de categorias raras nos conjuntos de dados.
+            """
+            # Aplicar mapeamentos nos dados de treinamento
+            if mappings is None:
+                mappings = {
+                    'Industry Code Description': industry_map,
+                    'WCIO Nature of Injury Description': nature_of_injury_map,
+                    'WCIO Cause of Injury Description': map_cause,
+                    'WCIO Part Of Body Description': map_part_of_body,
+                    'Carrier Type': map_carrier_type
+                }
+        
+                for column, map_func in mappings.items():
+                    if column in train.columns:
+                        train[f'Mapped {column}'] = train[column].apply(map_func)
+                        #print(f"Mapped '{column}' created")
+                    else:
+                        print(f"Column '{column}' not found in train DataFrame")
+        
+            # Aplicar mapeamentos em validação e teste
+            if val is not None:
+                for column, map_func in mappings.items():
+                    if column in val.columns:
+                        val[f'Mapped {column}'] = val[column].apply(map_func)
+                    else:
+                        print(f"Column '{column}' not found in validation DataFrame")
+        
+            if test is not None:
+                for column, map_func in mappings.items():
+                    if column in test.columns:
+                        test[f'Mapped {column}'] = test[column].apply(map_func)
+                    else:
+                        print(f"Column '{column}' not found in test DataFrame")
+            return train, val, test
+    
+        
+        def process_dataset(df, is_train=False, mappings=None, bounds=None, covid_start=None, covid_end=None,
+                            cols_to_impute=None, imputers=None, scalers=None):
+            # data types and formats
+            df = convert_to_binary(df, binary_columns)
+            df = convert_numeric_columns(df)
+            df = convert_categorical_and_dates(df)
+            df = process_gender_and_alternative_dispute(df)
+            df[columns_to_replace] = df[columns_to_replace].replace(0, np.nan)
+        
+            # Feature Engineering
+            df['Birth Year'] = df['Birth Year'].apply(lambda x: 0 if x < 1934 else x)
+            df['Missing_Dates'] = df.apply(check_missing_dates, axis=1)
+            df = validate_dates(df)
+            df['delay_days_category'] = (df['Assembly Date'] - df['Accident Date']).dt.days.apply(categorize_delay_days)
+            df = categorize_missing_info(df)
+            df['Wage Category'] = df['Average Weekly Wage'].apply(categorize_wage)
+            df['IME-4 Count Category'] = df['IME-4 Count'].apply(categorize_ime4_count)
+            df = add_covid_flag(df, covid_start, covid_end)
+            
+            if is_train:
+                # This part prcesses only the train datase to get the imputers, scalers and bounds, to avoid data leakage
+                df, imputers, scalers = process_missing_values(df, is_train=True, cols_to_impute=cols_to_impute, imputers=None, scalers=None)
+                mappings = {}
+                for code_col, desc_col in description_columns:
+                    mappings[desc_col] = df.groupby(desc_col)[code_col].apply(lambda x: x.value_counts().idxmax()).to_dict()
+                    df[code_col] = df[desc_col].map(mappings[desc_col])
+                    #print(f"Standardized {code_col} based on {desc_col}. Unique mappings created: {len(mappings[desc_col])}")
+                
+                if outlier_treatment:
+                    df, bounds = winsorize_with_iqr(df, variables_to_treat_outliers, iqr_threshold)
+                else:
+                    bounds = {}  # Inicializar bounds como dicionário vazio
+        
+            else:
+                if imputers is None or scalers is None:
+                    raise ValueError("Imputers and scalers must be provided for validation and test datasets.")
+                
+                # Processando os dados apenas transformando-os
+                df, _, _ = process_missing_values(df, is_train=False, cols_to_impute=cols_to_impute, imputers=imputers, scalers=scalers)
+        
+                # Aplicando os mapeamentos salvos durante o treinamento
+                if mappings is None:
+                    raise ValueError("Mappings must be provided for validation and test datasets.")
+                
+                for code_col, desc_col in description_columns:
+                    df[code_col] = df[desc_col].map(mappings[desc_col])
+                    #print(f"Applied training mappings to standardize {code_col}.")
+    
+                if outlier_treatment:
+                    if bounds is None:
+                        raise ValueError("Bounds must be provided for validation and test datasets.")
+                    for col in variables_to_treat_outliers:
+                        if col in bounds:
+                            lower, upper = bounds[col]
+                            df[col] = df[col].clip(lower, upper)
+        
+            return (df, imputers, scalers, mappings, bounds) if is_train else df
+    
+        # Process the training dataset
+        train, imputers, scalers, mappings, bounds = process_dataset(
+            train, is_train=True, covid_start=covid_start, covid_end=covid_end, cols_to_impute=cols_to_impute)
+    
+        # Process validation and test datasets
+        if val is not None:
+            val = process_dataset(val, is_train=False, mappings=mappings, bounds=bounds, covid_start=covid_start, 
+                                  covid_end=covid_end, cols_to_impute=cols_to_impute, imputers=imputers, scalers=scalers)
+    
+        if test is not None:
+            test = process_dataset(test, is_train=False, mappings=mappings, bounds=bounds, covid_start=covid_start, 
+                                   covid_end=covid_end, cols_to_impute=cols_to_impute, imputers=imputers, scalers=scalers)
+    
+        train, val, test = apply_mappings_and_grouping(train, val=val, test=test)
+    
+        # Drop irrelevant columns
+        train = train.drop(columns=columns_to_remove, errors='ignore')
+        if val is not None:
+            val = val.drop(columns=columns_to_remove, errors='ignore')
+        if test is not None:
+            test = test.drop(columns=columns_to_remove, errors='ignore')
+            
+        # Return the datasets - if we dont want to return the 3 datasets we now can 
+        if test is not None and val is not None:
+            return train, val, test
+        elif val is not None:
+            return train, val
+        elif test is not None:
+            return train, test
+        else:
+            return train
+          
+    # Pipeline 2: Grouping
+    def map_region(row):
+        region_group_mapping = {
+            'I': 'Medical Group 1',
+            'II': 'Medical Group 1',
+            'III': 'Medical Group 1',
+            'IV': 'Medical Group 2',
+            'UK': 'UK'
+        }
+        return region_group_mapping.get(row, row)
+    
+    def group_c2_related(row):
+        if "C-2" in row:
+            return "C-2 Related"
+        elif row in ['Accident Date', 'Accident Date, C-3 Date']:
+            return 'Accident Date, C-3 Date'
+        return row
+    
+    def group_delay_days(row):
+        if row in ['Long delays (181-365 days)', 'Medium delays (31-180 days)']:
+            return 'Grouped Delays (31-365 days)'
+        return row
+    
+    def group_missing_info(row):
+        if row in ['Low missing information', 'No missing information']:
+            return 'Grouped Low/No Missing Info'
+        elif row in ['High missing information', 'Moderate missing information']:
+            return 'Grouped High/Moderate Missing Info'
+        return row
+    
+    def group_wage_category(row):
+        if row in ['High Income (> Upper Fence)', 'Middle Income', 'Upper Middle Income (Q3 to Upper Fence)']:
+            return 'Grouped Middle to High Income'
+        elif row in ['Low Income', 'Very Low Income']:
+            return 'Grouped Low Income'
+        return row
+    
+    def group_ime4_count(row):
+        if row in ['High IME-4 Count', 'Very High IME-4 Count']:
+            return 'Grouped High IME-4 Count'
+        elif row in ['Low IME-4 Count', 'Medium IME-4 Count']:
+            return 'Grouped Low/Medium IME-4 Count'
+        return row
+    
+    def group_industry_code(row):
+        if row in ['Industry_high_1', 'Industry_high_2']:
+            return 'Industry_high_1_2'
+        elif row in ['Industry_high_4', 'Industry_high_5']:
+            return 'Industry_high_4_5'
+        elif row in ['Industry_high_3_2', 'Industry_high_3_mid_5']:
+            return 'Industry_high_3_2'
+        return row
+    
+    def group_injury_cause(row):
+        if row in ['Cause of Injury Cluster 0', 'Cause of Injury Cluster 14']:
+            return 'Cause of Injury Cluster 0_14'
+        elif row in ['Cause of Injury Cluster 12', 'Cause of Injury Cluster 6']:
+            return 'Cause of Injury Cluster 12_6'
+        elif row in ['Cause of Injury Cluster 7', 'Cause of Injury Cluster 8']:
+            return 'Cause of Injury Cluster 7_8'
+        return row
+    
+    def group_part_body(row):
+        if row in ['Part Of Body Cluster 0', 'Part Of Body Cluster 12']:
+            return 'Part Of Body Cluster 0_12'
+        return row
+    
+    # Função principal para aplicar agrupamentos
+    def apply_groupings(df):
+        df['Alternative Dispute Resolution'] = df['Alternative Dispute Resolution'].replace({'N': 0, 'Y': 1}).astype('int32')
+        df['Gender'] = df['Gender'].replace({'F': 0, 'M': 1}).astype('int32')
+        df['Medical Fee Region'] = df['Medical Fee Region'].map(map_region)
+        df["Missing_Dates"] = df["Missing_Dates"].apply(group_c2_related)
+        df['delay_days_category'] = df['delay_days_category'].apply(group_delay_days)
+        df['missing_info_category'] = df['missing_info_category'].apply(group_missing_info)
+        df['Wage Category'] = df['Wage Category'].apply(group_wage_category)
+        df['IME-4 Count Category'] = df['IME-4 Count Category'].apply(group_ime4_count)
+        df['Mapped Industry Code Description'] = df['Mapped Industry Code Description'].apply(group_industry_code)
+        df['Mapped WCIO Cause of Injury Description'] = df['Mapped WCIO Cause of Injury Description'].apply(group_injury_cause)
+        df['Mapped WCIO Part Of Body Description'] = df['Mapped WCIO Part Of Body Description'].apply(group_part_body)
+        df['Assembly Date or C-2 or C-3 Date before Accident Date'] = (
+            df['Assembly Date before Accident Date'] | df['C-2 or C-3 Date before Accident Date'])
+        df = df.drop(columns=['Assembly Date before Accident Date', 'C-2 or C-3 Date before Accident Date'])
+    
+        
+        return df
+    def encoder_and_scaler(scaler, fit_data, df, ordinal_columns, one_hot_columns, numerical_columns):
+        """
+        Preprocess data using specified scaler and encoders for ordinal and one-hot encoding.
+    
+        Args:
+            scaler: "standard" or "minmax"
+            fit_data: training data
+            df: DataFrame to preprocess (train, val or test).
+            ordinal_columns: List of columns for ordinal encoding.
+            one_hot_columns: List of columns for one-hot encoding.
+            numerical_columns: List of numerical columns for scaling.
+    
+        """
+        scalers = {"standard": StandardScaler(), "minmax": MinMaxScaler()}
+        scaler = scalers[scaler]
+        
+        # Encoders and scalers must be fitted on the train data
+        ordinal_encoder = OrdinalEncoder()
+        one_hot_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False)  # Use sparse_output=False
+        
+        # Fit encoders on the fit_data
+        if ordinal_columns:
+            ordinal_encoder.fit(fit_data[ordinal_columns])
+        if one_hot_columns:
+            one_hot_encoder.fit(fit_data[one_hot_columns])
+        if numerical_columns:
+            scaler.fit(fit_data[numerical_columns])
+        
+        # Apply transformations
+        ordinal_encoded = ordinal_encoder.transform(df[ordinal_columns]) if ordinal_columns else None
+        one_hot_encoded = one_hot_encoder.transform(df[one_hot_columns]) if one_hot_columns else None
+        scaled_numerical = scaler.transform(df[numerical_columns]) if numerical_columns else None
+        
+        # Generate new column names
+        one_hot_columns_names = (
+            one_hot_encoder.get_feature_names_out(one_hot_columns) if one_hot_columns else []
+        )
+        
+        # Combine transformed data into a DataFrame
+        transformed_dfs = []
+        if ordinal_encoded is not None:
+            transformed_dfs.append(pd.DataFrame(ordinal_encoded, columns=ordinal_columns, index=df.index))
+        if one_hot_encoded is not None:
+            transformed_dfs.append(pd.DataFrame(one_hot_encoded, columns=one_hot_columns_names, index=df.index))
+        if scaled_numerical is not None:
+            transformed_dfs.append(pd.DataFrame(scaled_numerical, columns=numerical_columns, index=df.index))
+        
+        # Include any columns not transformed
+        other_columns = df.drop(columns=ordinal_columns + one_hot_columns + numerical_columns, errors='ignore')
+        if not other_columns.empty:
+            transformed_dfs.append(other_columns)
+        
+        # Concatenate all parts into a single DataFrame
+        transformed_df = pd.concat(transformed_dfs, axis=1)
+        
+        return transformed_df
+    def reduce_memory_usage(df, continuous_columns):
+        """
+        Optimize the dataframe's memory usage, ensuring compatibility with algorithms like SMOTE.
+        Continuous columns are treated as float32 or float64, and other columns are treated as int32 or int64.
+        
+        Parameters:
+            df (pd.DataFrame): The dataframe to optimize.
+            continuous_columns (list): List of column names that are continuous.
+        """
+        start_mem = df.memory_usage().sum() / 1024**2
+        print('Memory usage of dataframe is {:.2f} MB'.format(start_mem))
+        
+        for col in df.columns:
+            col_type = df[col].dtype
+            c_min = df[col].min()
+            c_max = df[col].max()
+            
+            if col_type != object and col_type.name != 'category':
+                if col in continuous_columns:
+                    # Continuous columns: optimize as float32 or float64
+                    if c_min > np.finfo(np.float32).min and c_max < np.finfo(np.float32).max:
+                        df[col] = df[col].astype(np.float32)
+                    else:
+                        df[col] = df[col].astype(np.float64)
+                else:
+                    # Discrete columns: optimize as int32 or int64
+                    if c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
+                        df[col] = df[col].astype(np.int32)
+                    else:
+                        df[col] = df[col].astype(np.int64)
+            else:
+                df[col] = df[col].astype('category')  # Categorical columns remain as categories
+    
+        end_mem = df.memory_usage().sum() / 1024**2
+        print('Memory usage after optimization is: {:.2f} MB'.format(end_mem))
+        print('Decreased by {:.1f}%'.format(100 * (start_mem - end_mem) / start_mem))
+        
+        return df
+      
+    features = [
+        'Accident Date',
+        'Age at Injury',
+        'Alternative Dispute Resolution',
+        'Assembly Date',
+        'Attorney/Representative',
+        'Average Weekly Wage',
+        'Birth Year',
+        'C-2 Date',
+        'C-3 Date',
+        'Carrier Name',
+        'Carrier Type',
+        'County of Injury',
+        'COVID-19 Indicator',
+        'District Name',
+        'First Hearing Date',
+        'Gender',
+        'IME-4 Count',
+        'Industry Code',
+        'Industry Code Description',
+        'Medical Fee Region',
+        'WCIO Cause of Injury Code',
+        'WCIO Cause of Injury Description',
+        'WCIO Nature of Injury Description',
+        'WCIO Part Of Body Code',
+        'WCIO Part Of Body Description',
+        'Zip Code',
+        'Number of Dependents'
+    ]
+    
 
+    zip_file = "train_data.zip"  # Ensure the zip file is in the same directory
+    csv_file = "train_data.csv"
+
+    # Extract the contents of the zip file
+    try:
+        with zipfile.ZipFile(zip_file, 'r') as z:
+            if csv_file in z.namelist():
+                z.extractall()
+                st.success(f"Successfully extracted '{csv_file}' from '{zip_file}'.")
+            else:
+                st.error(f"'{csv_file}' not found in '{zip_file}'.")
+                return
+    except FileNotFoundError:
+        st.error(f"Zip file '{zip_file}' not found. Ensure it is in the correct directory.")
+        return
+    except zipfile.BadZipFile:
+        st.error(f"'{zip_file}' is not a valid zip file.")
+        return
+    except Exception as e:
+        st.error(f"An error occurred while extracting '{zip_file}': {e}")
+        return
+
+    # Load the dataset
+    try:
+        train_data = pd.read_csv(csv_file)
+        st.success("Dataset loaded successfully.")
+        st.write(f"Number of rows: {train_data.shape[0]}, Number of columns: {train_data.shape[1]}")
+        st.write("Sample Data:")
+        st.dataframe(train_data.head())  # Use Streamlit's dataframe widget for a cleaner display
+    except FileNotFoundError:
+        st.error(f"CSV file '{csv_file}' not found after extraction. Please verify the zip contents.")
+        return
+    except pd.errors.EmptyDataError:
+        st.error(f"CSV file '{csv_file}' is empty.")
+        return
+    except pd.errors.ParserError:
+        st.error(f"CSV file '{csv_file}' could not be parsed. Please ensure it is a valid CSV file.")
+        return
+    except Exception as e:
+        st.error(f"An error occurred while loading the dataset: {e}")
+        return
+    train_data.set_index('Claim Identifier', inplace=True)
+    columns_of_interest = train_data.columns[train_data.isnull().sum() == 19445]
+    # Drop rows where all columns in columns_of_interest have NaN values
+    train_to_split = train_data.dropna(subset=columns_of_interest, how='all')
+    train_to_split = train_to_split.drop(columns = 'OIICS Nature of Injury Description')
+    target_features = ["Agreement Reached", "WCB Decision", "Claim Injury Type"]
+    X = train_to_split.drop(columns=target_features)
+    y = train_to_split[['Claim Injury Type']]
+    
+    X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.7, stratify=y, shuffle=True, random_state=42)
+    
+    # Placeholder for loading the trained model (replace with your model file)
+    import joblib
+    model = joblib.load('logistic_model.joblib')  # Replace with the path to your trained model
+    
+    # Placeholder for preprocessing functions
+    def preprocess_input(train, interface_data, features,
+                          ordinal_columns, one_hot_columns,
+                          numerical_columns, outlier_treatment=True):
+        """
+        Preprocess user input to match the training data format.
+    
+        Args:
+            train (pd.DataFrame): Training dataset.
+            interface_data (pd.DataFrame): Data input from the interface.
+            features (list): Feature columns to select.
+            ordinal_columns (list): Ordinal columns.
+            one_hot_columns (list): One-hot columns.
+            numerical_columns (list): Numerical columns to scale.
+            outlier_treatment (bool): Whether to apply outlier treatment.
+    
+        Returns:
+            pd.DataFrame: Preprocessed interface data.
+        """
+        train, interface_data = preprocessing_pipeline(train, test=interface_data, val=None, outlier_treatment=outlier_treatment)
+        train_to_scale = apply_groupings(train)
+        interface_data_to_scale = apply_groupings(interface_data)
+    
+        def encode_and_scale(data_to_fit, data, method="standard"):
+            return encoder_and_scaler(
+                method,
+                fit_data=data_to_fit,
+                df=data,
+                ordinal_columns=ordinal_columns,
+                one_hot_columns=one_hot_columns,
+                numerical_columns=numerical_columns
+            )
+    
+        train = encode_and_scale(train_to_scale, train_to_scale)
+        interface_data = encode_and_scale(train_to_scale, interface_data_to_scale)
+    
+        train = reduce_memory_usage(train, numerical_columns)
+        interface_data = reduce_memory_usage(interface_data, numerical_columns)
+    
+        # Select features
+        train = train[features]
+        interface_data = interface_data[features]
+    
+        return interface_data
+    
+    # Function to extract unique values and formats from training data
+    def extract_column_info(train_data, excluded_columns):
+        """
+        Extracts unique values and formats for each column in the dataset.
+    
+        Args:
+            train_data (pd.DataFrame): The training dataset.
+            excluded_columns (list): Columns to exclude from extraction (e.g., target columns).
+    
+        Returns:
+            dict: A dictionary with column names as keys and unique values/formats as values.
+        """
+        column_info = {}
+        for col in train_data.columns:
+            if col not in excluded_columns:
+                if train_data[col].dtype == 'object':
+                    column_info[col] = train_data[col].dropna().unique().tolist()
+                elif np.issubdtype(train_data[col].dtype, np.number):
+                    column_info[col] = (train_data[col].min(), train_data[col].max())
+                elif np.issubdtype(train_data[col].dtype, np.datetime64):
+                    column_info[col] = "Date format (YYYY-MM-DD)"
+        return column_info
+
+    st.title("Claim Prediction Interface")
+    features = [col for col in train_data.columns if col not in target_features]
+
+    column_info = extract_column_info(train_data, target_features)
+
+    # Input fields for all columns except the target columns
+    st.header("Enter Claim Details")
+
+    input_data = {}
+    for col, info in column_info.items():
+        if isinstance(info, list):
+            input_data[col] = st.selectbox(f"{col} (Optional)", [""] + info)
+        elif isinstance(info, tuple):
+            min_val, max_val = info
+            input_data[col] = st.number_input(f"{col} (Optional, Range: {min_val} - {max_val})", value=None, step=1.0)
+        elif info == "Date format (YYYY-MM-DD)":
+            input_data[col] = st.text_input(f"{col} (Enter as YYYY-MM-DD or leave blank)")
+
+    if st.button("Predict Outcome"):
+        # Convert inputs to DataFrame
+        inputs = st.session_state.inputs
+        input_df = pd.DataFrame([inputs])
+    
+        # Preprocess the input data
+        preprocessed_data = preprocess_input(
+            train=X_train,
+            interface_data=input_df,
+            features=features,
+            ordinal_columns=ordinal_columns,
+            one_hot_columns=one_hot_columns,
+            numerical_columns=columns_to_scale,
+            outlier_treatment=True
+        )
+    
     st.markdown("**Please review all the information carefully before submitting.**")
     if st.button("Submit"):
         st.session_state.inputs = inputs
