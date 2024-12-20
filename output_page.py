@@ -884,32 +884,32 @@ def output_page():
 
 
 
-    # Predict button
-    if st.button("Predict Outcome"):
-        # Convert inputs to DataFrame
-        inputs = st.session_state.inputs
-        input_df = pd.DataFrame([inputs])
+    # Convert inputs to DataFrame
+    inputs = st.session_state.inputs
+    input_df = pd.DataFrame([inputs])
 
-        # Preprocess the input data
-        preprocessed_data = preprocess_input(
-            train=X_train,
-            interface_data=input_df,
-            features=features,
-            ordinal_columns=ordinal_columns,
-            one_hot_columns=one_hot_columns,
-            numerical_columns=columns_to_scale,
-            outlier_treatment=True
-        )
+    # Preprocess the input data
+    preprocessed_data = preprocess_input(
+        train=X_train,
+        interface_data=input_df,
+        features=features,
+        ordinal_columns=ordinal_columns,
+        one_hot_columns=one_hot_columns,
+        numerical_columns=columns_to_scale,
+        outlier_treatment=True
+    )
 
-        # Predict using the trained model
-        prediction = model.predict(preprocessed_data)
+    # Predict using the trained model
+    prediction = model.predict(preprocessed_data)
 
-        # Display the prediction result
-        st.subheader("Prediction Result")
-        st.write(f"The predicted outcome for the claim is: {prediction[0]}")
+    # Display the prediction result
+    st.subheader("Prediction Result")
+    st.write(f"The predicted outcome for the claim is: {prediction[0]}")
 
-if __name__ == "__main__":
-    main()
+
+    # Navigation
+    if st.button("Return to Welcome Page"):
+        st.session_state.page = 'welcome'
 
 
 
