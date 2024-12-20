@@ -729,25 +729,32 @@ def input_page():
         return df
       
     features = [
-     'Age at Injury',
-     'Alternative Dispute Resolution',
-     'Attorney/Representative',
-     'Gender',
-     'Assembly Date before Accident Date',
-     'Assembly Date or C-2 or C-3 Date before Accident Date',
-     'COVID Period',
-     'delay_days_category',
-     'IME-4 Count Category',
-     'Wage Category',
-     'missing_info_category',
-     'Number of Dependents',
-     'Medical Fee Region',
-     'Missing_Dates',
-     'Mapped Industry Code Description',
-     'Mapped WCIO Nature of Injury Description',
-     'Mapped WCIO Cause of Injury Description',
-     'Mapped WCIO Part Of Body Description',
-     'Mapped Carrier Type'
+    # From columns_to_scale
+    'Age at Injury',
+    
+    # From columns_already_encoded
+    'Alternative Dispute Resolution',
+    'Attorney/Representative',
+    'Gender',
+    'Assembly Date before Accident Date',
+    'Assembly Date or C-2 or C-3 Date before Accident Date',
+    'COVID Period',
+    
+    # From ordinal_columns
+    'delay_days_category',
+    'IME-4 Count Category',
+    'Wage Category',
+    'missing_info_category',
+    'Number of Dependents',
+    
+    # From one_hot_columns
+    'Medical Fee Region',
+    'Missing_Dates',
+    'Mapped Industry Code Description',
+    'Mapped WCIO Nature of Injury Description',
+    'Mapped WCIO Cause of Injury Description',
+    'Mapped WCIO Part Of Body Description',
+    'Mapped Carrier Type'
     ]
 
     
