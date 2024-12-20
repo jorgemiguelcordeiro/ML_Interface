@@ -903,7 +903,6 @@ def input_page():
 
     if st.button("Predict Outcome"):
         # Convert inputs to DataFrame
-        #inputs = st.session_state.inputs
         input_df = pd.DataFrame([input_data])
     
         # Preprocess the input data
@@ -916,12 +915,25 @@ def input_page():
             numerical_columns=columns_to_scale,
             outlier_treatment=True
         )
-        # Predict using the trained model
-        prediction = model.predict(preprocessed_data)
     
-        # Display the prediction result
-        st.subheader("Prediction Result")
-        st.write(f"The predicted outcome for the claim is: {prediction[0]}")
+        # Verify features before prediction
+        expected_features = model.feature_names_in_ if hasattr(model, "feature_names_in_") else None
+        input_features = preprocessed_data.columns.tolist()
+    
+        if expected_features is not None and set(expected_features) == set(input_features):
+            st.write("Feature check passed. Proceeding with prediction.")
+            
+            # Predict using the trained model
+            prediction = model.predict(preprocessed_data)
+    
+            # Display the prediction result
+            st.subheader("Prediction Result")
+            st.write(f"The predicted outcome for the claim is: {prediction[0]}")
+        else:
+            st.error("Feature mismatch detected!")
+            st.write("Expected Features:", expected_features)
+            st.write("Provided Features:", input_features)
+
     
     #st.markdown("**Please review all the information carefully before submitting.**")
     #if st.button("Submit"):
