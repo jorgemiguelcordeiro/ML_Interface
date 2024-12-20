@@ -894,10 +894,14 @@ def input_page():
         elif info == "Date format (YYYY-MM-DD)":
             input_data[col] = st.text_input(f"{col} (Enter as YYYY-MM-DD or leave blank)")
           
-    try:
-        if st.button("Predict Outcome"):
-            st.write("Button clicked!")
-            
+    # Add a text input field for the user to type "predict"
+    user_command = st.text_input("Type 'predict' to start the prediction process:")
+    
+    # Check if the user typed "predict" or clicked the button
+    if user_command.lower() == "predict" or st.button("Predict Outcome"):
+        try:
+            st.write("Prediction process started...")
+    
             # Convert inputs to DataFrame
             try:
                 st.write("Input data:", input_data)
@@ -906,7 +910,7 @@ def input_page():
             except Exception as e:
                 st.error(f"Error creating input DataFrame: {e}")
                 return
-            
+    
             # Preprocess the input data
             try:
                 st.write("Starting preprocessing...")
@@ -923,7 +927,7 @@ def input_page():
             except Exception as e:
                 st.error(f"Error during preprocessing: {e}")
                 return
-            
+    
             # Check if features match
             try:
                 st.write("Validating features...")
@@ -937,7 +941,7 @@ def input_page():
             except Exception as e:
                 st.error(f"Error during feature validation: {e}")
                 return
-            
+    
             # Predict using the trained model
             try:
                 st.write("Making prediction...")
@@ -946,12 +950,14 @@ def input_page():
             except Exception as e:
                 st.error(f"Error during prediction: {e}")
                 return
-            
+    
             # Display the prediction result
             st.subheader("Prediction Result")
             st.write(f"The predicted outcome for the claim is: {prediction[0]}")
-  except Exception as e:  # Ensure this aligns with the outermost try
-      st.error(f"An error occurred: {e}")
+    
+        except Exception as e:  # Catch any outer-level errors
+            st.error(f"An error occurred: {e}")
+
 
 
 
