@@ -957,7 +957,7 @@ def input_page():
             #st.session_state.inputs = inputs
             #st.session_state.page = "output"
             #st.success("Your data has been submitted! You will be redirected to the output page.")
-  except Exception as e:
-      st.error(f"An error occurred: {e}")
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
 
 
