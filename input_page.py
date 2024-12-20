@@ -903,8 +903,8 @@ def input_page():
 
     if st.button("Predict Outcome"):
         # Convert inputs to DataFrame
-        inputs = st.session_state.inputs
-        input_df = pd.DataFrame([inputs])
+        #inputs = st.session_state.inputs
+        input_df = pd.DataFrame([input_data])
     
         # Preprocess the input data
         preprocessed_data = preprocess_input(
