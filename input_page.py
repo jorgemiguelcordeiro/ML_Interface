@@ -729,34 +729,27 @@ def input_page():
         return df
       
     features = [
-        'Accident Date',
-        'Age at Injury',
-        'Alternative Dispute Resolution',
-        'Assembly Date',
-        'Attorney/Representative',
-        'Average Weekly Wage',
-        'Birth Year',
-        'C-2 Date',
-        'C-3 Date',
-        'Carrier Name',
-        'Carrier Type',
-        'County of Injury',
-        'COVID-19 Indicator',
-        'District Name',
-        'First Hearing Date',
-        'Gender',
-        'IME-4 Count',
-        'Industry Code',
-        'Industry Code Description',
-        'Medical Fee Region',
-        'WCIO Cause of Injury Code',
-        'WCIO Cause of Injury Description',
-        'WCIO Nature of Injury Description',
-        'WCIO Part Of Body Code',
-        'WCIO Part Of Body Description',
-        'Zip Code',
-        'Number of Dependents'
+     'Age at Injury',
+     'Alternative Dispute Resolution',
+     'Attorney/Representative',
+     'Gender',
+     'Assembly Date before Accident Date',
+     'Assembly Date or C-2 or C-3 Date before Accident Date',
+     'COVID Period',
+     'delay_days_category',
+     'IME-4 Count Category',
+     'Wage Category',
+     'missing_info_category',
+     'Number of Dependents',
+     'Medical Fee Region',
+     'Missing_Dates',
+     'Mapped Industry Code Description',
+     'Mapped WCIO Nature of Injury Description',
+     'Mapped WCIO Cause of Injury Description',
+     'Mapped WCIO Part Of Body Description',
+     'Mapped Carrier Type'
     ]
+
     
 
     zip_file = "train_data.zip"  # Ensure the zip file is in the same directory
