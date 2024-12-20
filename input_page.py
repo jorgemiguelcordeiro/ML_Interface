@@ -895,61 +895,61 @@ def input_page():
             input_data[col] = st.text_input(f"{col} (Enter as YYYY-MM-DD or leave blank)")
           
     try:
-    if st.button("Predict Outcome"):
-        st.write("Button clicked!")
-        
-        # Convert inputs to DataFrame
-        try:
-            st.write("Input data:", input_data)
-            input_df = pd.DataFrame([input_data])
-            st.write("Input DataFrame created successfully:", input_df)
-        except Exception as e:
-            st.error(f"Error creating input DataFrame: {e}")
-            return
-        
-        # Preprocess the input data
-        try:
-            st.write("Starting preprocessing...")
-            preprocessed_data = preprocess_input(
-                train=X_train,
-                interface_data=input_df,
-                features=features,
-                ordinal_columns=ordinal_columns,
-                one_hot_columns=one_hot_columns,
-                numerical_columns=columns_to_scale,
-                outlier_treatment=True
-            )
-            st.write("Preprocessing completed successfully:", preprocessed_data)
-        except Exception as e:
-            st.error(f"Error during preprocessing: {e}")
-            return
-        
-        # Check if features match
-        try:
-            st.write("Validating features...")
-            expected_features = (
-                model.get_booster().feature_names if hasattr(model, "get_booster") else model.feature_names_in_
-            )
-            if not all(feature in preprocessed_data.columns for feature in expected_features):
-                st.error(f"Feature mismatch! Expected: {expected_features}, Got: {preprocessed_data.columns}")
+        if st.button("Predict Outcome"):
+            st.write("Button clicked!")
+            
+            # Convert inputs to DataFrame
+            try:
+                st.write("Input data:", input_data)
+                input_df = pd.DataFrame([input_data])
+                st.write("Input DataFrame created successfully:", input_df)
+            except Exception as e:
+                st.error(f"Error creating input DataFrame: {e}")
                 return
-            st.write("Feature validation successful.")
-        except Exception as e:
-            st.error(f"Error during feature validation: {e}")
-            return
-        
-        # Predict using the trained model
-        try:
-            st.write("Making prediction...")
-            prediction = model.predict(preprocessed_data)
-            st.write("Prediction successful:", prediction)
-        except Exception as e:
-            st.error(f"Error during prediction: {e}")
-            return
-        
-        # Display the prediction result
-        st.subheader("Prediction Result")
-        st.write(f"The predicted outcome for the claim is: {prediction[0]}")
+            
+            # Preprocess the input data
+            try:
+                st.write("Starting preprocessing...")
+                preprocessed_data = preprocess_input(
+                    train=X_train,
+                    interface_data=input_df,
+                    features=features,
+                    ordinal_columns=ordinal_columns,
+                    one_hot_columns=one_hot_columns,
+                    numerical_columns=columns_to_scale,
+                    outlier_treatment=True
+                )
+                st.write("Preprocessing completed successfully:", preprocessed_data)
+            except Exception as e:
+                st.error(f"Error during preprocessing: {e}")
+                return
+            
+            # Check if features match
+            try:
+                st.write("Validating features...")
+                expected_features = (
+                    model.get_booster().feature_names if hasattr(model, "get_booster") else model.feature_names_in_
+                )
+                if not all(feature in preprocessed_data.columns for feature in expected_features):
+                    st.error(f"Feature mismatch! Expected: {expected_features}, Got: {preprocessed_data.columns}")
+                    return
+                st.write("Feature validation successful.")
+            except Exception as e:
+                st.error(f"Error during feature validation: {e}")
+                return
+            
+            # Predict using the trained model
+            try:
+                st.write("Making prediction...")
+                prediction = model.predict(preprocessed_data)
+                st.write("Prediction successful:", prediction)
+            except Exception as e:
+                st.error(f"Error during prediction: {e}")
+                return
+            
+            # Display the prediction result
+            st.subheader("Prediction Result")
+            st.write(f"The predicted outcome for the claim is: {prediction[0]}")
   except Exception as e:
       st.error(f"An error occurred: {e}")
 
