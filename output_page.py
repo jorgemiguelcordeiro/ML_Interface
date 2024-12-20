@@ -768,7 +768,8 @@ def output_page():
         with z.open(csv_file) as original, open(renamed_file, 'wb') as renamed:
             renamed.write(original.read())
     
-    print(f"Extracted and renamed {csv_file} to {renamed_file}")
+    # Load the extracted and renamed file into a DataFrame
+    train_data = pd.read_csv(renamed_file)
     train_data.set_index('Claim Identifier', inplace=True)
     columns_of_interest = train_data.columns[train_to_split.isnull().sum() == 19445]
     # Drop rows where all columns in columns_of_interest have NaN values
