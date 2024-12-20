@@ -728,36 +728,36 @@ def output_page():
         
         return df
       
-features = [
-    'Accident Date',
-    'Age at Injury',
-    'Alternative Dispute Resolution',
-    'Assembly Date',
-    'Attorney/Representative',
-    'Average Weekly Wage',
-    'Birth Year',
-    'C-2 Date',
-    'C-3 Date',
-    'Carrier Name',
-    'Carrier Type',
-    'County of Injury',
-    'COVID-19 Indicator',
-    'District Name',
-    'First Hearing Date',
-    'Gender',
-    'IME-4 Count',
-    'Industry Code',
-    'Industry Code Description',
-    'Medical Fee Region',
-    'WCIO Cause of Injury Code',
-    'WCIO Cause of Injury Description',
-    'WCIO Nature of Injury Description',
-    'WCIO Part Of Body Code',
-    'WCIO Part Of Body Description',
-    'Zip Code',
-    'Number of Dependents'
-]
-
+    features = [
+        'Accident Date',
+        'Age at Injury',
+        'Alternative Dispute Resolution',
+        'Assembly Date',
+        'Attorney/Representative',
+        'Average Weekly Wage',
+        'Birth Year',
+        'C-2 Date',
+        'C-3 Date',
+        'Carrier Name',
+        'Carrier Type',
+        'County of Injury',
+        'COVID-19 Indicator',
+        'District Name',
+        'First Hearing Date',
+        'Gender',
+        'IME-4 Count',
+        'Industry Code',
+        'Industry Code Description',
+        'Medical Fee Region',
+        'WCIO Cause of Injury Code',
+        'WCIO Cause of Injury Description',
+        'WCIO Nature of Injury Description',
+        'WCIO Part Of Body Code',
+        'WCIO Part Of Body Description',
+        'Zip Code',
+        'Number of Dependents'
+    ]
+    
 
     zip_file = "train_data.zip"  # Ensure the zip file is in the same directory
     csv_file = "train_data.csv"
