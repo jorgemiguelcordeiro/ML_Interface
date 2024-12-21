@@ -200,18 +200,18 @@ def input_page():
         def debug_step(name, df):
             """Imprime informações úteis sobre o estado do dataframe."""
             #st.write(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
-            debug_info[name] = {"shape": df.shape, "null_count": df.isnull().sum().sum()}
+            #debug_info[name] = {"shape": df.shape, "null_count": df.isnull().sum().sum()}
         
         def convert_to_binary(df, columns):
             for col in columns:
                 df[col] = (df[col] == 'Y').astype(int)
-            debug_step("convert_to_binary", df)
+            #debug_step("convert_to_binary", df)
             return df
     
         def convert_numeric_columns(df):
             numeric_cols = df.select_dtypes(['int64', 'float64']).columns
             df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric)
-            debug_step("convert_numeric_columns", df)
+            #debug_step("convert_numeric_columns", df)
             return df
     
         def convert_categorical_and_dates(df):
@@ -221,12 +221,12 @@ def input_page():
                 else:
                     df[col] = df[col].astype('category')
             return df
-            debug_step("convert_categorical_and_dates", df)
+            #debug_step("convert_categorical_and_dates", df)
     
         def add_covid_flag(df, covid_start, covid_end):
             df['COVID Period'] = ((df['Accident Date'] >= covid_start) & 
                                   (df['Accident Date'] <= covid_end)).astype(int)
-            debug_step("add_covid_flag", df)
+            #debug_step("add_covid_flag", df)
             return df
     
         def winsorize_with_iqr(df, columns, iqr_threshold):
@@ -239,7 +239,7 @@ def input_page():
                 df[col] = df[col].clip(lower, upper)
                 bounds[col] = (lower, upper)
                 print(f"Bounds for {col}: Lower = {lower}, Upper = {upper}")
-            debug_step("winsorize_with_iqr", df)
+            #debug_step("winsorize_with_iqr", df)
             return df, bounds
             
         def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
@@ -290,7 +290,7 @@ def input_page():
                                                                 np.nan, 
                                                                 df['Alternative Dispute Resolution'])
             return df
-            debug_step("process_gender_and_alternative_dispute", df)
+            #debug_step("process_gender_and_alternative_dispute", df)
        
         #Columns categorization
         
@@ -305,7 +305,7 @@ def input_page():
                 return "Long delays (181-365 days)"
             else:
                 return "Very long delays (>365 days)"
-            debug_step("categorize_delay_days", df)
+            #debug_step("categorize_delay_days", df)
     
         def categorize_missing_info(df):
             def categorize(x):
@@ -321,7 +321,7 @@ def input_page():
                     return "Very high missing information"
             
             df['missing_info_category'] = df.isna().sum(axis=1).apply(categorize)
-            debug_step("categorize_missing_info", df)
+            #debug_step("categorize_missing_info", df)
             return df
     
         def categorize_wage(x):
@@ -337,7 +337,7 @@ def input_page():
                 return 'Upper Middle Income (Q3 to Upper Fence)'
             else:
                 return 'High Income (> Upper Fence)'
-            debug_step("categorize_wage", df)
+            #debug_step("categorize_wage", df)
     
         def categorize_ime4_count(count):
             if pd.isna(count) or count < 0:
@@ -352,14 +352,14 @@ def input_page():
                 return "High IME-4 Count"
             else:
                 return "Very High IME-4 Count"
-            debug_step("categorize_ime4_count", df)
+            #debug_step("categorize_ime4_count", df)
     
         def check_missing_dates(row):
             missing_columns = [
                 col for col in ["Accident Date", "C-3 Date", "C-2 Date", "Assembly Date", "First Hearing Date"] 
                 if pd.isna(row[col])]
             return ", ".join(missing_columns) if missing_columns else "OK"
-            debug_step("check_missing_dates", df)
+            #debug_step("check_missing_dates", df)
     
         def validate_dates(df):
             # Rule 1: Assembly Date before Accident Date
@@ -382,7 +382,7 @@ def input_page():
                     pd.notna(row["C-3 Date"]) and row["C-3 Date"] > row["Assembly Date"]
                 ]) 
                 else 0, axis=1)
-            debug_step("validate_dates", df)
+            #debug_step("validate_dates", df)
             return df
     
         # Funções de mapeamento para diferentes descrições
