@@ -199,7 +199,7 @@ def input_page():
     
         def debug_step(name, df):
             """Imprime informações úteis sobre o estado do dataframe."""
-            #print(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
+            st.write(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
             debug_info[name] = {"shape": df.shape, "null_count": df.isnull().sum().sum()}
         
         def convert_to_binary(df, columns):
@@ -211,7 +211,7 @@ def input_page():
         def convert_numeric_columns(df):
             numeric_cols = df.select_dtypes(['int64', 'float64']).columns
             df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric)
-            #debug_step("convert_numeric_columns", df)
+            debug_step("convert_numeric_columns", df)
             return df
     
         def convert_categorical_and_dates(df):
@@ -221,12 +221,12 @@ def input_page():
                 else:
                     df[col] = df[col].astype('category')
             return df
-            #debug_step("convert_categorical_and_dates", df)
+            debug_step("convert_categorical_and_dates", df)
     
         def add_covid_flag(df, covid_start, covid_end):
             df['COVID Period'] = ((df['Accident Date'] >= covid_start) & 
                                   (df['Accident Date'] <= covid_end)).astype(int)
-            #debug_step("add_covid_flag", df)
+            debug_step("add_covid_flag", df)
             return df
     
         def winsorize_with_iqr(df, columns, iqr_threshold):
@@ -239,7 +239,7 @@ def input_page():
                 df[col] = df[col].clip(lower, upper)
                 bounds[col] = (lower, upper)
                 print(f"Bounds for {col}: Lower = {lower}, Upper = {upper}")
-            #debug_step("winsorize_with_iqr", df)
+            debug_step("winsorize_with_iqr", df)
             return df, bounds
             
         def process_missing_values(df, is_train=False, cols_to_impute=None, imputers=None, scalers=None):
