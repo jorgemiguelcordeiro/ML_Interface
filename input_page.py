@@ -199,7 +199,7 @@ def input_page():
     
         def debug_step(name, df):
             """Imprime informações úteis sobre o estado do dataframe."""
-            #print(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
+            print(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
             debug_info[name] = {"shape": df.shape, "null_count": df.isnull().sum().sum()}
         
         def convert_to_binary(df, columns):
@@ -463,9 +463,17 @@ def input_page():
         def process_dataset(df, is_train=False, mappings=None, bounds=None, covid_start=None, covid_end=None,
                             cols_to_impute=None, imputers=None, scalers=None):
             # data types and formats
+            buffer = io.StringIO()
+            df.info(buf=buffer)
+            info_str = buffer.getvalue()
+            st.text(info_str)                 
             df = convert_to_binary(df, binary_columns)
             df = convert_numeric_columns(df)
             df = convert_categorical_and_dates(df)
+            buffer = io.StringIO()
+            df.info(buf=buffer)
+            info_str = buffer.getvalue()
+            st.text(info_str)                  
             df = process_gender_and_alternative_dispute(df)
             df[columns_to_replace] = df[columns_to_replace].replace(0, np.nan)
         
