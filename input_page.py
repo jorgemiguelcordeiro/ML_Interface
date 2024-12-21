@@ -867,22 +867,8 @@ def input_page():
     def preprocess_input(train, interface_data, features,
                           ordinal_columns, one_hot_columns,
                           numerical_columns, outlier_treatment=True):
-        """
-        Preprocess user input to match the training data format.
-    
-        Args:
-            train (pd.DataFrame): Training dataset.
-            interface_data (pd.DataFrame): Data input from the interface.
-            features (list): Feature columns to select.
-            ordinal_columns (list): Ordinal columns.
-            one_hot_columns (list): One-hot columns.
-            numerical_columns (list): Numerical columns to scale.
-            outlier_treatment (bool): Whether to apply outlier treatment.
-    
-        Returns:
-            pd.DataFrame: Preprocessed interface data.
-        """
-        st.write('arroz a começar \n')                   
+        
+        st.write('preprocessing_pipeline starting \n')                   
         train, interface_data = preprocessing_pipeline(train,  test=interface_data, val=None,outlier_treatment=outlier_treatment)
         st.write('Completed preprocessing_pipeline function. \n')
         st.write('Step 2: Applying groupings to train data... \n')                    
