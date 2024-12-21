@@ -879,7 +879,7 @@ def input_page():
         Returns:
             pd.DataFrame: Preprocessed interface data.
         """
-        train, interface_data = preprocessing_pipeline(train, val=None, test=interface_data,  outlier_treatment=outlier_treatment)
+        train, interface_data = preprocessing_pipeline(train,  test=interface_data, val=None,outlier_treatment=outlier_treatment)
         train_to_scale = apply_groupings(train)
         interface_data_to_scale = apply_groupings(interface_data)
     
