@@ -883,9 +883,13 @@ def input_page():
             pd.DataFrame: Preprocessed interface data.
         """
         train, interface_data = preprocessing_pipeline(train,  test=interface_data, val=None,outlier_treatment=outlier_treatment)
+        st.write('Completed preprocessing_pipeline function. \n')
+        st.write('Step 2: Applying groupings to train data... \n')                    
         train_to_scale = apply_groupings(train)
+        st.write('Completed applying groupings to train. \n')
+        st.write('Step 3: Applying groupings to user input data... \n')                    
         interface_data_to_scale = apply_groupings(interface_data)
-    
+        st.write('Completed applying groupings to user input \n')
         def encode_and_scale(data_to_fit, data, method="standard"):
             return encoder_and_scaler(
                 method,
@@ -895,10 +899,14 @@ def input_page():
                 one_hot_columns=one_hot_columns,
                 numerical_columns=numerical_columns
             )
-    
+        st.write('Step 4: Encoding & scaling train data...\n')
         train = encode_and_scale(train_to_scale, train_to_scale)
+        st.write(" Completed encoding & scaling train data.\n")
+                            
+        st.write(" Step 5: Encoding & scaling user input data...\n")                   
         interface_data = encode_and_scale(train_to_scale, interface_data_to_scale)
-    
+        st.write(" Completed encoding & scaling user input data.\n")
+                            
         train = reduce_memory_usage(train, numerical_columns)
         interface_data = reduce_memory_usage(interface_data, numerical_columns)
     
