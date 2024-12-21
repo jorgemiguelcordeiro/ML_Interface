@@ -967,6 +967,7 @@ def input_page():
                 return
            # Preprocess the input data
             try:
+                logging.debug("Starting preprocessing...")
                 st.write("Starting preprocessing...")
                 preprocessed_data = preprocess_input(
                     train=X_train,
