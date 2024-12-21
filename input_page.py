@@ -882,6 +882,7 @@ def input_page():
         Returns:
             pd.DataFrame: Preprocessed interface data.
         """
+        st.write('arroz a começar \n')                   
         train, interface_data = preprocessing_pipeline(train,  test=interface_data, val=None,outlier_treatment=outlier_treatment)
         st.write('Completed preprocessing_pipeline function. \n')
         st.write('Step 2: Applying groupings to train data... \n')                    
