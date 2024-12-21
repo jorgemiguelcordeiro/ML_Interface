@@ -199,7 +199,7 @@ def input_page():
     
         def debug_step(name, df):
             """Imprime informações úteis sobre o estado do dataframe."""
-            st.write(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
+            #st.write(f"DEBUG [{name}] - Shape: {df.shape}, Nulls: {df.isnull().sum().sum()}")
             debug_info[name] = {"shape": df.shape, "null_count": df.isnull().sum().sum()}
         
         def convert_to_binary(df, columns):
