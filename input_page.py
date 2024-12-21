@@ -828,7 +828,7 @@ def input_page():
 
     # Load the dataset
     try:
-        train_data = pd.read_csv(csv_file)
+        train_data = pd.read_csv(csv_file, low_memory=False)
         st.success("Dataset loaded successfully.")
         st.write(f"Number of rows: {train_data.shape[0]}, Number of columns: {train_data.shape[1]}")
         st.write("Sample Data:")
