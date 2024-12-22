@@ -679,7 +679,6 @@ X_train, X_val, y_train, y_val = train_test_split(
     X, y, train_size=0.7, stratify=y, shuffle=True, random_state=42
 )
 
-@st.cache_resource
 # Load the trained model
 model = joblib.load('optimized_logistic_2.joblib')  # Replace with the path to your trained model
 
