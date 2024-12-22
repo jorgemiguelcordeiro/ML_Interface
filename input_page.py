@@ -745,18 +745,7 @@ def extract_column_info(train_data, excluded_columns):
 
 
 def input_page():
-    """
-    Streamlit page that collects input from the user, preprocesses it, and predicts the claim outcome.
-    """
-    st.sidebar.title("Instructions")
-    st.sidebar.write(
-        """Please provide details about the claim in the fields below. 
-        Make sure each field is filled in according to the best available data. 
-        You can leave a field blank if you don’t have any information for it."""
-    )
-
-    # Optionally, replace 'ny_logo.png' with your actual local file or an online URL:
-    st.sidebar.image('New York Workers Compensation Board (WCB).png')
+   
 
     # --- Main page content ---
     st.title("New York Workers’ Compensation Claim Prediction")
