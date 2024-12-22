@@ -660,6 +660,8 @@ def reduce_memory_usage(df, continuous_columns):
 # (placeholder) This is an example feature list
 # Remove "Number of Dependents" from the features list
 features = ['delay_days_category', 'IME-4 Count Category', 'Wage Category', 'missing_info_category', 'Medical Fee Region_Medical Group 1', 'Medical Fee Region_UK', 'Missing_Dates_Accident Date, C-3 Date', 'Missing_Dates_Accident Date, C-3 Date, First Hearing Date', 'Missing_Dates_Accident Date, First Hearing Date', 'Missing_Dates_C-2 Related', 'Missing_Dates_C-3 Date', 'Missing_Dates_C-3 Date, First Hearing Date', 'Missing_Dates_First Hearing Date', 'Missing_Dates_OK', 'Mapped Industry Code Description_Industry_high_0', 'Mapped Industry Code Description_Industry_high_1_2', 'Mapped Industry Code Description_Industry_high_3_2', 'Mapped Industry Code Description_Industry_high_4_5', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 0', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 1', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 10', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 11', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 12', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 13', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 14', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 15', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 16', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 17', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 2', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 3', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 4', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 5', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 6', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 8', 'Mapped WCIO Nature of Injury Description_Nature of Injury Cluster 9', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 0_14', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 1', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 10', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 11', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 12_6', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 13', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 15', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 2', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 3', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 4', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 5', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 7_8', 'Mapped WCIO Cause of Injury Description_Cause of Injury Cluster 9', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 0_12', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 1', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 10', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 11', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 2', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 3', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 4', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 5', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 6', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 7', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 8', 'Mapped WCIO Part Of Body Description_Part Of Body Cluster 9', 'Mapped Carrier Type_Public Carriers', 'Mapped Carrier Type_SF_0_2', 'Mapped Carrier Type_SF_0_3', 'Mapped Carrier Type_SF_2_1', 'Mapped Carrier Type_Unknown', 'Age at Injury', 'Alternative Dispute Resolution', 'Attorney/Representative', 'Gender', 'C-2 or C-3 Date after Assembly Date', 'COVID Period', 'Assembly Date or C-2 or C-3 Date before Accident Date']
+features = [feature.replace("\xa0", " ") for feature in features]
+
 
 # Here we assume you have a local CSV with your training data
 with zipfile.ZipFile("train_data.zip", 'r') as z:
@@ -745,10 +747,11 @@ def extract_column_info(train_data, excluded_columns):
 
 
 def input_page():
-   
+    """
+    Streamlit page that collects input from the user, preprocesses it, and predicts the claim outcome.
+    """
+    st.title("Claim Prediction Interface")
 
-    # --- Main page content ---
-    st.title("New York Workers’ Compensation Claim Prediction")
     # We build a dictionary of possible input options from the training data (for demonstration).
     # In practice, adapt to your use case: 
     # - Some columns might not make sense for user input, or
@@ -814,5 +817,4 @@ def input_page():
 # you can just call `input_page()` at the bottom of the script:
 if __name__ == "__main__":
     input_page()
-
 
