@@ -681,7 +681,9 @@ features = [feature.replace("\xa0", " ") for feature in features]
 features = [feature for feature in features if feature != "Number of Dependents"]
 
 # Here we assume you have a local CSV with your training data
-train_data = pd.read_csv("train_data.csv")  
+with zipfile.ZipFile("train_data.zip", 'r') as z:
+    with z.open("train_data.csv") as f:
+        train_data = pd.read_csv(f)  
 train_data.set_index('Claim Identifier', inplace=True)
 columns_of_interest = train_data.columns[train_data.isnull().sum() == 19445]
 train_to_split = train_data.dropna(subset=columns_of_interest, how='all')
