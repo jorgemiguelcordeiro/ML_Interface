@@ -756,7 +756,7 @@ def input_page():
     )
 
     # Optionally, replace 'ny_logo.png' with your actual local file or an online URL:
-    st.sidebar.image('New York Workers' Compensation Board (WCB).png')
+    st.sidebar.image('New York Workers Compensation Board (WCB).png')
 
     # --- Main page content ---
     st.title("New York Workers’ Compensation Claim Prediction")
