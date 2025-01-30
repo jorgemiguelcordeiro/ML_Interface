@@ -1,6 +1,6 @@
 # ML_Interface
 
-This interface on streamlit was developed on behalf of the Machine learning project. 
+This interface on streamlit was developed on behalf of the Machine learning project (check github repository). 
 The integration of Streamlit provides a user-friendly platform for collecting and processing 
 input data, applying the preprocessing pipeline in real time to ensure accurate predictions. 
 However, during implementation, the application crashed upon clicking the Predict button, 
